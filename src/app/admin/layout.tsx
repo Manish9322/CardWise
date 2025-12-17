@@ -71,11 +71,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="flex items-center justify-between p-2">
+        <SidebarHeader className="p-2">
             <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
               CardWise
             </Link>
-            <SidebarToggle />
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
@@ -85,23 +84,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-questions'} tooltip="Manage Questions">
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-questions')} tooltip="Manage Questions">
                 <Link href="/admin/manage-questions"><BookCopy /><span>Manage Questions</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-users'} tooltip="Manage Users">
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-users')} tooltip="Manage Users">
                 <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
+        <SidebarFooter className="flex-col items-stretch gap-2 border-t p-2">
           <form action={handleLogout} className="w-full">
              <SidebarMenuButton asChild tooltip="Logout">
                 <button type="submit" className="w-full"><LogOut /><span>Logout</span></button>
             </SidebarMenuButton>
           </form>
+          <div className={cn("flex items-center", useSidebar().state === 'collapsed' ? 'justify-center' : 'justify-end')}>
+            <SidebarToggle />
+          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
