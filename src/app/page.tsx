@@ -58,7 +58,6 @@ export default function Home() {
   const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -78,22 +77,13 @@ export default function Home() {
   const handleReveal = () => {
     if (!isFlipped) {
       setIsFlipped(true);
-      setShowConfetti(true);
     } else {
       setIsFlipped(false);
     }
   };
 
-  useEffect(() => {
-    if (showConfetti) {
-      const timer = setTimeout(() => setShowConfetti(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showConfetti]);
-
   const handleNextCard = () => {
     setIsAnimating(true);
-    setShowConfetti(false);
     setTimeout(() => {
         setIsFlipped(false);
         dispatch(nextCard());
@@ -146,7 +136,6 @@ export default function Home() {
                 question={currentCard.question}
                 answer={currentCard.answer}
                 isFlipped={isFlipped}
-                showConfetti={showConfetti}
             />
         </div>
         <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">

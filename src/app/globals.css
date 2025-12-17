@@ -86,19 +86,3 @@ body {
     @apply bg-background text-foreground transition-colors duration-300;
   }
 }
-
-@layer utilities {
-  @keyframes confetti-pop {
-    0% {
-      transform: scale(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(var(--scale, 1)) rotate(360deg) translateX(var(--translateX)) translateY(var(--translateY));
-      opacity: 0;
-    }
-  }
-  .confetti-piece {
-    animation: confetti-pop 0.8s ease-out forwards;
-  }
-}
