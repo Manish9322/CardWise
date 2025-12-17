@@ -25,10 +25,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Menu, RotateCw, ArrowRight, Search, User } from 'lucide-react';
+import { Terminal, Menu, RotateCw, ArrowRight, Search, User, Database } from 'lucide-react';
 import type { Card as CardType } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,6 +112,7 @@ export default function Home() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -142,6 +144,23 @@ export default function Home() {
         dispatch(nextCard());
         setIsAnimating(false);
     }, 300);
+  };
+
+  const handleTestDB = async () => {
+    const response = await fetch('/api/test-connection');
+    const data = await response.json();
+    if (data.success) {
+      toast({
+        title: 'Success!',
+        description: data.message,
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error!',
+        description: data.error,
+      });
+    }
   };
 
   const renderContent = () => {
@@ -194,7 +213,13 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
        {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
-       <QuestionsSidebar cards={cards} />
+       <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex items-center gap-2">
+        <Button onClick={handleTestDB} size="icon" className="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 rounded-full">
+            <Database className="h-6 w-6" />
+            <span className="sr-only">Test DB Connection</span>
+        </Button>
+        <QuestionsSidebar cards={cards} />
+       </div>
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
       </main>
