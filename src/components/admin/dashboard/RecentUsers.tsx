@@ -1,4 +1,7 @@
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,11 +16,19 @@ export function RecentUsers({ users }: { users: User[] }) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Recent Users</CardTitle>
-        <CardDescription>
-          New users who recently joined.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center">
+        <div className="grid gap-2">
+            <CardTitle>Recent Users</CardTitle>
+            <CardDescription>
+            New users who recently joined.
+            </CardDescription>
+        </div>
+        <Button asChild size="sm" className="ml-auto gap-1">
+            <Link href="/admin/manage-users">
+                View All
+                <ArrowUpRight className="h-4 w-4" />
+            </Link>
+        </Button>
       </CardHeader>
       <CardContent className="grid gap-8">
         {recentUsers.map((user) => (
