@@ -6,6 +6,7 @@ import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/c
 import { getActiveCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
+import Confetti from '@/components/game/Confetti';
 import {
   Accordion,
   AccordionContent,
@@ -58,6 +59,7 @@ export default function Home() {
   const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -75,10 +77,10 @@ export default function Home() {
   }, [dispatch]);
 
   const handleReveal = () => {
-    if (!isFlipped) {
-      setIsFlipped(true);
-    } else {
-      setIsFlipped(false);
+    const newFlippedState = !isFlipped;
+    setIsFlipped(newFlippedState);
+    if (newFlippedState) {
+        setShowConfetti(true);
     }
   };
 
@@ -164,6 +166,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
+       {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
        <QuestionsSidebar cards={cards} />
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
