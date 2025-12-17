@@ -6,6 +6,7 @@ import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/c
 import { getActiveCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
+import Confetti from '@/components/game/Confetti';
 import {
   Accordion,
   AccordionContent,
@@ -57,6 +58,7 @@ export default function Home() {
   const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -73,8 +75,25 @@ export default function Home() {
     fetchCards();
   }, [dispatch]);
 
+  const handleReveal = () => {
+    if (!isFlipped) {
+      setIsFlipped(true);
+      setShowConfetti(true);
+    } else {
+      setIsFlipped(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => setShowConfetti(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
+
   const handleNextCard = () => {
     setIsAnimating(true);
+    setShowConfetti(false);
     setTimeout(() => {
         setIsFlipped(false);
         dispatch(nextCard());
@@ -85,7 +104,7 @@ export default function Home() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex flex-col items-center justify-center text-center w-full max-w-md lg:max-w-2xl">
+        <div className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
             <Skeleton className="h-[24rem] w-full rounded-xl" />
             <div className="mt-12 flex gap-4">
               <Skeleton className="h-14 w-48 rounded-full" />
@@ -119,8 +138,9 @@ export default function Home() {
 
     return (
       <div className="flex flex-col items-center justify-center text-center w-full flex-1">
+        {showConfetti && <Confetti active={showConfetti} />}
         <div className={cn(
-            "transition-all duration-300 ease-in-out",
+            "transition-all duration-300 ease-in-out w-full",
             isAnimating ? "opacity-0 translate-x-[-50px]" : "opacity-100 translate-x-0"
         )}>
             <GuessCard 
@@ -131,13 +151,13 @@ export default function Home() {
         </div>
         <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
           <Button 
-            onClick={() => setIsFlipped(!isFlipped)} 
+            onClick={handleReveal}
             variant="outline" 
             size="lg"
             className="rounded-full w-48 h-14 text-base"
           >
               <RotateCw />
-              Reveal
+              {isFlipped ? 'Hide' : 'Reveal'}
           </Button>
           <Button 
             onClick={handleNextCard} 
@@ -154,7 +174,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-hidden">
        <QuestionsSidebar cards={cards} />
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}

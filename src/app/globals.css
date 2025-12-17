@@ -86,3 +86,19 @@ body {
     @apply bg-background text-foreground transition-colors duration-300;
   }
 }
+
+@layer utilities {
+  @keyframes confetti-fall {
+    0% {
+      opacity: 1;
+      transform: translateY(-10vh) rotateZ(0deg);
+    }
+    100% {
+      opacity: 0.5;
+      transform: translateY(110vh) rotateZ(360deg);
+    }
+  }
+  .confetti-piece {
+    animation: confetti-fall 3s linear forwards;
+  }
+}
