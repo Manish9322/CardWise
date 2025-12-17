@@ -40,7 +40,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 md:top-6 md:right-6 z-10 text-muted-foreground hover:text-foreground">
+        <Button size="icon" className="absolute top-4 right-4 md:top-6 md:right-6 z-10 bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 rounded-full">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Open questions</span>
         </Button>
@@ -200,7 +200,7 @@ export default function Home() {
       </main>
       <div className="fixed top-4 left-4 z-10 flex flex-col gap-2">
         <ThemeToggle />
-        <Button asChild variant="ghost" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm">
+        <Button asChild size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">
           <Link href="/profile">
             <User className="h-6 w-6" />
             <span className="sr-only">Go to Profile</span>
@@ -210,18 +210,16 @@ export default function Home() {
       <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
           <Button 
             onClick={handleReveal}
-            variant="ghost" 
             size="icon"
-            className="rounded-full bg-card/80 backdrop-blur-sm"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
           >
               <RotateCw className="h-6 w-6" />
               <span className="sr-only">{isFlipped ? 'Hide' : 'Reveal'}</span>
           </Button>
           <Button 
             onClick={handleNextCard} 
-            variant="ghost"
             size="icon"
-            className="rounded-full bg-card/80 backdrop-blur-sm"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
             disabled={isAnimating}
           >
               <ArrowRight className="h-6 w-6" />
