@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation';
 import {
   Home,
   LogOut,
-  HelpCircle,
   Users,
   PanelLeft,
+  BookCopy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +15,6 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarTrigger,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -28,18 +27,26 @@ import { useAppDispatch } from '@/lib/store/hooks';
 import { setAuthenticated } from '@/lib/store/features/auth/authSlice';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 function SidebarToggle() {
     const { state, toggleSidebar } = useSidebar();
     return (
-        <Button
-            variant="ghost"
-            size="icon"
-            className={cn("h-8 w-8", state === "collapsed" && "mx-auto")}
-            onClick={toggleSidebar}
-        >
-            <PanelLeft className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn("h-9 w-9", state === "collapsed" && "mx-auto")}
+                    onClick={toggleSidebar}
+                >
+                    <PanelLeft className="h-4 w-4" />
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" align="center">
+                {state === 'expanded' ? 'Collapse' : 'Expand'}
+            </TooltipContent>
+        </Tooltip>
     )
 }
 
@@ -64,42 +71,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader>
-          <div className="flex items-center justify-center group-data-[collapsible=icon]:justify-center">
+        <SidebarHeader className="flex items-center justify-between p-2">
             <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
               CardWise
             </Link>
-          </div>
+            <SidebarToggle />
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip={{ children: "Dashboard" }}>
+              <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip="Dashboard">
                 <Link href="/admin"><Home /><span>Dashboard</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-questions'} tooltip={{ children: "Manage Questions" }}>
-                <Link href="/admin/manage-questions"><HelpCircle /><span>Manage Questions</span></Link>
+              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-questions'} tooltip="Manage Questions">
+                <Link href="/admin/manage-questions"><BookCopy /><span>Manage Questions</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-users'} tooltip={{ children: "Manage Users" }}>
+              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-users'} tooltip="Manage Users">
                 <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="flex-col items-stretch gap-0">
-          <form action={handleLogout} className="group-data-[collapsible=icon]:w-full">
-            <Button variant="ghost" className="w-full justify-center gap-2 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
-              <LogOut className="h-4 w-4" />
-              <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-            </Button>
+        <SidebarFooter>
+          <form action={handleLogout} className="w-full">
+             <SidebarMenuButton asChild tooltip="Logout">
+                <button type="submit" className="w-full"><LogOut /><span>Logout</span></button>
+            </SidebarMenuButton>
           </form>
-          <div className="border-t border-sidebar-border w-full mt-2 pt-2 group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:pt-0">
-            
-          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import type { Card } from '@/lib/definitions';
 import { updateCardAction, deleteCardAction } from '@/lib/actions/cardActions';
@@ -132,11 +131,6 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       enableHiding: false,
     },
     {
-      accessorKey: 'username',
-      header: 'Username',
-      cell: () => 'Admin', // Placeholder as we don't have user data
-    },
-    {
       accessorKey: 'id',
       header: ({ column }) => {
         return (
@@ -159,7 +153,12 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
     {
       accessorKey: 'answer',
       header: 'Answer',
-      cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('answer')}</div>
+      cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('answer')}</div>,
+    },
+     {
+      accessorKey: 'username',
+      header: 'Added By',
+      cell: () => 'Admin', // Placeholder as we don't have user data
     },
     {
         accessorKey: 'status',
