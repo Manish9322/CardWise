@@ -8,10 +8,10 @@ type GuessCardProps = {
 
 export default function GuessCard({ question, answer, isFlipped }: GuessCardProps) {
   return (
-    <div className="relative h-96 w-full flex items-center justify-center">
+    <div className="relative h-96 w-full max-w-full flex items-center justify-center">
       <div
         className={cn(
-          'flex items-center justify-center p-6 text-7xl md:text-9xl font-semibold text-center leading-tight transition-opacity duration-300 ease-in-out',
+          'inset-0 flex items-center justify-center p-6 text-6xl md:text-8xl font-semibold text-center leading-tight transition-opacity duration-300 ease-in-out',
           isFlipped ? 'opacity-0' : 'opacity-100'
         )}
       >
@@ -19,7 +19,7 @@ export default function GuessCard({ question, answer, isFlipped }: GuessCardProp
       </div>
       <div
         className={cn(
-          'absolute inset-0 flex items-center justify-center p-6 text-7xl md:text-9xl font-bold text-primary text-center leading-tight transition-opacity duration-300 ease-in-out',
+          'inset-0 flex items-center justify-center p-6 text-6xl md:text-8xl font-bold text-primary text-center leading-tight transition-opacity duration-300 ease-in-out',
           isFlipped ? 'opacity-100' : 'opacity-0'
         )}
       >
