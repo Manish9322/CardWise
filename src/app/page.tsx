@@ -16,6 +16,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -23,11 +24,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Menu, RotateCw, ArrowRight } from 'lucide-react';
+import { Terminal, Menu, RotateCw, ArrowRight, Search } from 'lucide-react';
 import type { Card as CardType } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredCards = cards.filter(card =>
+    card.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    card.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -36,19 +44,36 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
           <span className="sr-only">Open questions</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:w-[540px] overflow-y-auto">
+      <SheetContent className="w-full sm:w-[540px] flex flex-col">
         <SheetHeader>
           <SheetTitle>All Questions</SheetTitle>
+          <SheetDescription>Browse through all the available questions and their answers.</SheetDescription>
         </SheetHeader>
-        <Accordion type="single" collapsible className="w-full mt-4">
-          {cards.map((card) => (
-            <AccordionItem value={card.id} key={card.id}>
-              <AccordionTrigger>{card.question}</AccordionTrigger>
-
-              <AccordionContent>{card.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="Search questions..."
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="overflow-y-auto mt-4 flex-1">
+          {filteredCards.length > 0 ? (
+             <div className="space-y-2">
+              {filteredCards.map((card, index) => (
+                <div key={card.id} className={cn("p-4 rounded-lg", index % 2 === 0 ? "bg-muted/50" : "bg-muted")}>
+                  <h4 className="font-semibold">{card.question}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{card.answer}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground mt-10">
+              <p>No questions found.</p>
+            </div>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   )
