@@ -6,7 +6,6 @@ import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/c
 import { getActiveCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
-import Confetti from '@/components/game/Confetti';
 import {
   Accordion,
   AccordionContent,
@@ -44,6 +43,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
           {cards.map((card) => (
             <AccordionItem value={card.id} key={card.id}>
               <AccordionTrigger>{card.question}</AccordionTrigger>
+
               <AccordionContent>{card.answer}</AccordionContent>
             </AccordionItem>
           ))}
@@ -138,7 +138,6 @@ export default function Home() {
 
     return (
       <div className="flex flex-col items-center justify-center text-center w-full flex-1">
-        {showConfetti && <Confetti active={showConfetti} />}
         <div className={cn(
             "transition-all duration-300 ease-in-out w-full",
             isAnimating ? "opacity-0 translate-x-[-50px]" : "opacity-100 translate-x-0"
@@ -147,6 +146,7 @@ export default function Home() {
                 question={currentCard.question}
                 answer={currentCard.answer}
                 isFlipped={isFlipped}
+                showConfetti={showConfetti}
             />
         </div>
         <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">

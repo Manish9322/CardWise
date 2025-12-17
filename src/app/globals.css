@@ -88,17 +88,17 @@ body {
 }
 
 @layer utilities {
-  @keyframes confetti-fall {
+  @keyframes confetti-pop {
     0% {
+      transform: scale(0) rotate(0deg);
       opacity: 1;
-      transform: translateY(-10vh) rotateZ(0deg);
     }
     100% {
-      opacity: 0.5;
-      transform: translateY(110vh) rotateZ(360deg);
+      transform: scale(var(--scale, 1)) rotate(360deg) translateX(var(--translateX)) translateY(var(--translateY));
+      opacity: 0;
     }
   }
   .confetti-piece {
-    animation: confetti-fall 3s linear forwards;
+    animation: confetti-pop 0.8s ease-out forwards;
   }
 }

@@ -1,12 +1,14 @@
 import { cn } from '@/lib/utils';
+import Confetti from './Confetti';
 
 type GuessCardProps = {
   question: string;
   answer: string;
   isFlipped: boolean;
+  showConfetti: boolean;
 };
 
-export default function GuessCard({ question, answer, isFlipped }: GuessCardProps) {
+export default function GuessCard({ question, answer, isFlipped, showConfetti }: GuessCardProps) {
   return (
     <div className="relative h-96 w-full flex items-center justify-center">
       <div
@@ -23,6 +25,7 @@ export default function GuessCard({ question, answer, isFlipped }: GuessCardProp
           isFlipped ? 'opacity-100' : 'opacity-0'
         )}
       >
+        <Confetti active={showConfetti} />
         {answer}
       </div>
     </div>
