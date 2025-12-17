@@ -63,8 +63,8 @@ export default function ManageQuestionsPage() {
   }
 
   const totalQuestions = cards.length;
-  const activeQuestions = cards.filter(c => c.status === 'active').length;
-  const inactiveQuestions = cards.filter(c => c.status === 'inactive').length;
+  const activeQuestions = cards.filter((c: any) => c.status === 'active').length;
+  const inactiveQuestions = cards.filter((c: any) => c.status === 'inactive').length;
   
   // Dummy data for users, as we don't have user data yet.
   const totalUsers = 1;
