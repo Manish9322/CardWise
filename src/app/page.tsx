@@ -6,7 +6,7 @@ import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/c
 import { getActiveCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
-import Confetti from '@/components/game/Confetti';
+import ReactConfetti from 'react-confetti';
 import {
   Accordion,
   AccordionContent,
@@ -52,6 +52,31 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
       </SheetContent>
     </Sheet>
   )
+}
+
+function ConfettiWrapper({ onComplete }: { onComplete: () => void }) {
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const { innerWidth: width, innerHeight: height } = window;
+    setDimensions({
+      width,
+      height,
+    });
+  }, []);
+
+  if (dimensions.width === 0) return null;
+
+  return (
+    <ReactConfetti
+      width={dimensions.width}
+      height={dimensions.height}
+      numberOfPieces={200}
+      recycle={false}
+      onConfettiComplete={onComplete}
+      className="!fixed"
+    />
+  );
 }
 
 export default function Home() {
@@ -131,7 +156,7 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center text-center w-full flex-1">
         <div className={cn(
-            "transition-all duration-300 ease-in-out w-full",
+            "transition-all duration-300 ease-in-out w-full flex-1 flex items-center justify-center",
             isAnimating ? "opacity-0 translate-x-[-50px]" : "opacity-100 translate-x-0"
         )}>
             <GuessCard 
@@ -166,7 +191,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
-       {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
+       {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
        <QuestionsSidebar cards={cards} />
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
