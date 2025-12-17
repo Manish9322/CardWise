@@ -41,7 +41,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button size="icon" className="absolute top-4 right-4 md:top-6 md:right-6 z-10 bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 rounded-full">
+        <Button size="icon" className="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 rounded-full">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Open questions</span>
         </Button>
@@ -214,10 +214,6 @@ export default function Home() {
     <div className="flex min-h-screen flex-col overflow-hidden">
        {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex items-center gap-2">
-        <Button onClick={handleTestDB} size="icon" className="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 rounded-full">
-            <Database className="h-6 w-6" />
-            <span className="sr-only">Test DB Connection</span>
-        </Button>
         <QuestionsSidebar cards={cards} />
        </div>
       <main className="flex flex-1 flex-col items-center justify-center p-4">
@@ -230,6 +226,10 @@ export default function Home() {
             <User className="h-6 w-6" />
             <span className="sr-only">Go to Profile</span>
           </Link>
+        </Button>
+        <Button onClick={handleTestDB} size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">
+            <Database className="h-6 w-6" />
+            <span className="sr-only">Test DB Connection</span>
         </Button>
       </div>
       <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
