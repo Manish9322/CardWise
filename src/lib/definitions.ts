@@ -7,3 +7,13 @@ export type Card = {
   // This is a placeholder as we don't have user data yet
   username?: string;
 };
+
+export type User = {
+  id: string;
+  username: string;
+  email: string;
+  phone: string;
+  questionsAdded: number;
+  status: 'active' | 'inactive';
+  createdAt: string;
+};

@@ -8,6 +8,7 @@ import {
   LogOut,
   BookCopy,
   HelpCircle,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -61,6 +62,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === '/admin/manage-questions'}>
                 <Link href="/admin/manage-questions"><HelpCircle />Manage Questions</Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-users'}>
+                <Link href="/admin/manage-users"><Users />Manage Users</Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
