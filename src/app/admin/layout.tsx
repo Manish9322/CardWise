@@ -7,6 +7,7 @@ import {
   PlusCircle,
   LogOut,
   BookCopy,
+  HelpCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -55,6 +56,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === '/admin'}>
                 <Link href="/admin"><Home />Dashboard</Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/admin/manage-questions'}>
+                <Link href="/admin/manage-questions"><HelpCircle />Manage Questions</Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>

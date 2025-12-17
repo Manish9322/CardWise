@@ -31,8 +31,9 @@ export async function createCardAction(formData: FormData) {
 
   await db.createCard(data);
   revalidatePath('/admin');
+  revalidatePath('/admin/manage-questions');
   revalidatePath('/');
-  redirect('/admin');
+  // Don't redirect for modal forms
 }
 
 export async function updateCardAction(id: string, formData: FormData) {
@@ -44,13 +45,15 @@ export async function updateCardAction(id: string, formData: FormData) {
 
   await db.updateCard(id, data);
   revalidatePath('/admin');
+  revalidatePath('/admin/manage-questions');
   revalidatePath(`/admin/cards/${id}/edit`);
   revalidatePath('/');
-  redirect('/admin');
+  // We don't redirect here so the modal can close itself.
 }
 
 export async function deleteCardAction(id: string) {
   await db.deleteCard(id);
   revalidatePath('/admin');
+  revalidatePath('/admin/manage-questions');
   revalidatePath('/');
 }
