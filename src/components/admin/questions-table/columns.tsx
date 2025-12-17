@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
