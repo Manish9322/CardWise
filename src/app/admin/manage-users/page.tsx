@@ -14,7 +14,7 @@ export default async function ManageUsersPage() {
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
   const inactiveUsers = users.filter(u => u.status === 'inactive').length;
-  const totalQuestionsAdded = users.reduce((acc, user) => acc + user.questionsAdded, 0);
+  const totalQuestionsAdded = users.reduce((acc, user) => acc + (user.questionsAdded || 0), 0);
 
   return (
     <div className="space-y-6">

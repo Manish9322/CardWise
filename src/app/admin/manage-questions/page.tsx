@@ -1,15 +1,66 @@
+'use client';
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, BookCopy, CheckCircle, XCircle } from 'lucide-react';
-import { getAllCards } from '@/lib/actions/cardActions';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw } from 'lucide-react';
+import { useGetQuestionsQuery } from '@/utils/services/api';
 import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
+import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
 
-export default async function ManageQuestionsPage() {
-  const cards = await getAllCards();
+export default function ManageQuestionsPage() {
+  const { data: cards, error, isLoading, isFetching, refetch } = useGetQuestionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  if (isLoading) {
+    return <ManageQuestionsSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-[80vh] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+            <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold text-destructive">Error Fetching Data</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                There was a problem loading the questions. Please try again.
+            </p>
+            <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retry
+            </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!cards || cards.length === 0) {
+    return (
+       <div className="space-y-6">
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
+            <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+        </div>
+        <div className="text-center py-16 rounded-lg border-2 border-dashed">
+            <BookCopy className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold">No Questions Found</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                Get started by adding a new question.
+            </p>
+             <div className="mt-4">
+                {/* In a future step, this button will open a modal */}
+                <Button>Add New Question</Button>
+            </div>
+        </div>
+      </div>
+    );
+  }
 
   const totalQuestions = cards.length;
   const activeQuestions = cards.filter(c => c.status === 'active').length;
@@ -20,9 +71,15 @@ export default async function ManageQuestionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
-        <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
+            <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+        </div>
+         <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
+            {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+            Refresh
+        </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
