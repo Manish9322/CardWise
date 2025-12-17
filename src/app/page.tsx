@@ -28,6 +28,7 @@ import { Terminal, Menu, RotateCw, ArrowRight, Search } from 'lucide-react';
 import type { Card as CardType } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import Header from '@/components/common/Header';
 
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -193,6 +194,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
        {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
+       <Header />
        <QuestionsSidebar cards={cards} />
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}

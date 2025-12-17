@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, LogIn, LayoutDashboard } from 'lucide-react';
+import { Menu, LogIn, LayoutDashboard, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -33,6 +33,10 @@ export default function Header() {
               <Link href="/" className="flex items-center gap-2 rounded-lg p-2 hover:bg-muted">
                 <LayoutDashboard className="h-5 w-5" />
                 <span>Play</span>
+              </Link>
+               <Link href="/profile" className="flex items-center gap-2 rounded-lg p-2 hover:bg-muted">
+                <User className="h-5 w-5" />
+                <span>My Profile</span>
               </Link>
               <Link href="/admin" className="flex items-center gap-2 rounded-lg p-2 hover:bg-muted">
                 <LogIn className="h-5 w-5" />
