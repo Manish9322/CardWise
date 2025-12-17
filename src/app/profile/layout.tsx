@@ -24,7 +24,6 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import Header from '@/components/common/Header';
 
 function SidebarToggle() {
     const { state, toggleSidebar } = useSidebar();
@@ -54,8 +53,8 @@ function ProfileSidebar() {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="p-2">
-                <Link href="/profile" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
-                My Profile
+                <Link href="/" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
+                 CardWise
                 </Link>
             </SidebarHeader>
             <SidebarContent>
@@ -87,14 +86,11 @@ function ProfileSidebar() {
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-    <Header />
     <SidebarProvider>
         <ProfileSidebar />
         <SidebarInset>
             <main className="p-4 sm:p-6 lg:p-8">{children}</main>
         </SidebarInset>
     </SidebarProvider>
-    </>
   );
 }

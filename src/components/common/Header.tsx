@@ -10,8 +10,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function Header() {
+  const pathname = usePathname();
+  const isProfilePage = pathname.startsWith('/profile');
+
+  if (isProfilePage) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
