@@ -123,10 +123,6 @@ export default function Home() {
       return (
         <div className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
             <Skeleton className="h-[24rem] w-full rounded-xl" />
-            <div className="mt-12 flex gap-4">
-              <Skeleton className="h-14 w-48 rounded-full" />
-              <Skeleton className="h-14 w-48 rounded-full" />
-            </div>
         </div>
       );
     }
@@ -165,26 +161,6 @@ export default function Home() {
                 isFlipped={isFlipped}
             />
         </div>
-        <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
-          <Button 
-            onClick={handleReveal}
-            variant="outline" 
-            size="lg"
-            className="rounded-full w-48 h-14 text-base"
-          >
-              <RotateCw />
-              {isFlipped ? 'Hide' : 'Reveal'}
-          </Button>
-          <Button 
-            onClick={handleNextCard} 
-            size="lg"
-            className="rounded-full w-48 h-14 text-base"
-            disabled={isAnimating}
-          >
-              Next
-              <ArrowRight />
-          </Button>
-        </div>
       </div>
     );
   };
@@ -197,6 +173,27 @@ export default function Home() {
         {renderContent()}
       </main>
       <ThemeToggle />
+      <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
+          <Button 
+            onClick={handleReveal}
+            variant="ghost" 
+            size="icon"
+            className="rounded-full bg-card/80 backdrop-blur-sm"
+          >
+              <RotateCw className="h-6 w-6" />
+              <span className="sr-only">{isFlipped ? 'Hide' : 'Reveal'}</span>
+          </Button>
+          <Button 
+            onClick={handleNextCard} 
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-card/80 backdrop-blur-sm"
+            disabled={isAnimating}
+          >
+              <ArrowRight className="h-6 w-6" />
+              <span className="sr-only">Next Card</span>
+          </Button>
+        </div>
     </div>
   );
 }
