@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -51,6 +53,8 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 
 export default function RegisterForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // In a real app, this would be a server action
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -69,21 +73,53 @@ export default function RegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="username">Username</Label>
-                    <Input id="username" name="username" placeholder="johndoe" required />
+                    <Input id="username" name="username" placeholder="Enter you name here" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+                    <Input id="email" name="email" type="email" placeholder="Enter your mail here" required />
+                </div>
+            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                        <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required />
+                        <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                     <div className="relative">
+                        <Input id="confirm-password" name="confirm-password" type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password" required />
+                        <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="123-456-7890" required />
+                    <Input id="phone" name="phone" type="tel" placeholder="93228 97948" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="address">Address (Optional)</Label>
-                    <Input id="address" name="address" placeholder="123 Main St" />
+                    <Input id="address" name="address" placeholder="Airoli, Navi Mumbai, Maharashtra" />
                 </div>
             </div>
           <Button type="submit" className="w-full">
