@@ -1,15 +1,65 @@
+'use client';
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, UserCheck, UserX, HelpCircle } from 'lucide-react';
-import { getAllUsers } from '@/lib/actions/userActions';
+import { Users, UserCheck, UserX, HelpCircle, Terminal, RefreshCw } from 'lucide-react';
+import { useGetUsersQuery } from '@/utils/services/api';
 import { UsersTable } from '@/components/admin/users-table/UsersTable';
+import { ManageUsersSkeleton } from '@/components/admin/skeletons/ManageUsersSkeleton';
 
-export default async function ManageUsersPage() {
-  const users = await getAllUsers();
+export default function ManageUsersPage() {
+  const { data: users, error, isLoading, isFetching, refetch } = useGetUsersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  if (isLoading) {
+    return <ManageUsersSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-[80vh] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+            <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold text-destructive">Error Fetching Data</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                There was a problem loading the users. Please try again.
+            </p>
+            <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retry
+            </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!users || users.length === 0) {
+    return (
+       <div className="space-y-6">
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
+            <p className="text-muted-foreground mt-1">View and manage all registered users in your application.</p>
+        </div>
+        <div className="text-center py-16 rounded-lg border-2 border-dashed">
+            <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold">No Users Found</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                Get started by adding a new user.
+            </p>
+             <div className="mt-4">
+                {/* In a future step, this button will open a modal */}
+                <Button>Add New User</Button>
+            </div>
+        </div>
+      </div>
+    );
+  }
+
 
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
@@ -18,9 +68,15 @@ export default async function ManageUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
-        <p className="text-muted-foreground mt-1">View and manage all registered users in your application.</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
+            <p className="text-muted-foreground mt-1">View and manage all registered users in your application.</p>
+        </div>
+         <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
+            {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+            Refresh
+        </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
