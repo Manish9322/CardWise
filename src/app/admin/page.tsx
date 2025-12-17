@@ -3,7 +3,6 @@ import {
   Activity,
   ArrowUpRight,
   BookCopy,
-  PlusCircle,
   Users,
   HelpCircle,
   UserPlus,
@@ -92,13 +91,7 @@ export default async function Dashboard() {
           </Card>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
-                <Link href="/admin/cards/new">
-                    <PlusCircle className="h-6 w-6" />
-                    <span className="text-sm font-medium">New Question</span>
-                </Link>
-            </Button>
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
                 <Link href="/admin/manage-users">
                     <UserPlus className="h-6 w-6" />

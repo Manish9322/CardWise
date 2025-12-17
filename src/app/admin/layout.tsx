@@ -4,9 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home,
-  PlusCircle,
   LogOut,
-  BookCopy,
   HelpCircle,
   Users,
   PanelLeft,
@@ -88,16 +86,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === '/admin/manage-users'} tooltip={{ children: "Manage Users" }}>
                 <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/admin/cards/new'} tooltip={{ children: "New Card" }}>
-                <Link href="/admin/cards/new"><PlusCircle /><span>New Card</span></Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={{ children: "Play Game" }}>
-                <Link href="/"><BookCopy /><span>Play Game</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
