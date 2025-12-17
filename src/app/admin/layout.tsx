@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
+          <div className="flex items-center justify-center group-data-[collapsible=icon]:justify-center">
             <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
               CardWise
             </Link>
@@ -104,13 +104,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </SidebarContent>
         <SidebarFooter className="flex-col items-stretch gap-0">
           <form action={handleLogout} className="group-data-[collapsible=icon]:w-full">
-            <Button variant="ghost" className="w-full justify-center gap-2 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:p-0">
+            <Button variant="ghost" className="w-full justify-center gap-2 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
               <LogOut className="h-4 w-4" />
               <span className="group-data-[collapsible=icon]:hidden">Logout</span>
             </Button>
           </form>
           <div className="border-t border-sidebar-border w-full mt-2 pt-2 group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:pt-0">
-            <SidebarToggle />
+            
           </div>
         </SidebarFooter>
       </Sidebar>
