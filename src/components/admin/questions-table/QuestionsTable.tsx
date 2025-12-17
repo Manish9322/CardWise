@@ -39,21 +39,25 @@ export function QuestionsTable({ data }: QuestionsTableProps) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
-  const [isViewOpen, setIsViewOpen] = React.useState(false);
+  const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
   const [selectedQuestion, setSelectedQuestion] = React.useState<Card | null>(null);
 
   const handleOpenForm = (question: Card | null = null) => {
     setSelectedQuestion(question);
-    setIsFormOpen(true);
+    setActiveModal('form');
   };
   
   const handleOpenView = (question: Card) => {
     setSelectedQuestion(question);
-    setIsViewOpen(true);
+    setActiveModal('view');
   };
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), []);
+  const handleCloseModals = () => {
+    setActiveModal(null);
+    setSelectedQuestion(null);
+  }
+
+  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), [handleOpenForm, handleOpenView]);
 
   const table = useReactTable({
     data,
@@ -129,14 +133,14 @@ export function QuestionsTable({ data }: QuestionsTableProps) {
       </div>
       <QuestionsTablePagination table={table} />
       <QuestionFormModal
-        isOpen={isFormOpen}
-        onOpenChange={setIsFormOpen}
+        isOpen={activeModal === 'form'}
+        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
         question={selectedQuestion}
       />
       {selectedQuestion && (
          <ViewQuestionModal
-            isOpen={isViewOpen}
-            onOpenChange={setIsViewOpen}
+            isOpen={activeModal === 'view'}
+            onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
             question={selectedQuestion}
         />
       )}

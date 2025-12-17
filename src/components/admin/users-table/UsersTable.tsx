@@ -39,21 +39,25 @@ export function UsersTable({ data }: UsersTableProps) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
-  const [isViewOpen, setIsViewOpen] = React.useState(false);
+  const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
 
   const handleOpenForm = (user: User | null = null) => {
     setSelectedUser(user);
-    setIsFormOpen(true);
+    setActiveModal('form');
   };
   
   const handleOpenView = (user: User) => {
     setSelectedUser(user);
-    setIsViewOpen(true);
+    setActiveModal('view');
   };
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), []);
+  const handleCloseModals = () => {
+    setActiveModal(null);
+    setSelectedUser(null);
+  }
+
+  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), [handleOpenForm, handleOpenView]);
 
   const table = useReactTable({
     data,
@@ -129,14 +133,14 @@ export function UsersTable({ data }: UsersTableProps) {
       </div>
       <UsersTablePagination table={table} />
       <UserFormModal
-        isOpen={isFormOpen}
-        onOpenChange={setIsFormOpen}
+        isOpen={activeModal === 'form'}
+        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
         user={selectedUser}
       />
       {selectedUser && (
          <ViewUserModal
-            isOpen={isViewOpen}
-            onOpenChange={setIsViewOpen}
+            isOpen={activeModal === 'view'}
+            onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
             user={selectedUser}
         />
       )}

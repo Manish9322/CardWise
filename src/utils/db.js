@@ -1,6 +1,6 @@
 // db.js
 import mongoose from "mongoose";
-import { MONGODB_URL } from "./config.js";
+import { MONGODB_URL } from "./config";
 
 export const _db = async () => {
   try {
