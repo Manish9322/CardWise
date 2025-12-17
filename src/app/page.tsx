@@ -29,7 +29,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10">
+        <Button variant="ghost" size="icon" className="absolute top-4 right-4 md:top-6 md:right-6 z-10 text-muted-foreground hover:text-foreground">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Open questions</span>
         </Button>
@@ -83,8 +83,11 @@ export default function Home() {
     if (isLoading) {
       return (
         <div className="flex flex-col items-center justify-center text-center w-full max-w-md lg:max-w-2xl">
-            <Skeleton className="h-80 w-full rounded-xl" />
-            <Skeleton className="mt-8 h-12 w-48" />
+            <Skeleton className="h-[24rem] w-full rounded-xl" />
+            <div className="mt-12 flex gap-4">
+              <Skeleton className="h-14 w-48 rounded-full" />
+              <Skeleton className="h-14 w-48 rounded-full" />
+            </div>
         </div>
       );
     }
@@ -118,13 +121,22 @@ export default function Home() {
             answer={currentCard.answer}
             isFlipped={isFlipped}
         />
-        <div className="mt-8 flex gap-4">
-          <Button onClick={() => setIsFlipped(!isFlipped)} variant="outline" size="lg">
+        <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
+          <Button 
+            onClick={() => setIsFlipped(!isFlipped)} 
+            variant="outline" 
+            size="lg"
+            className="rounded-full w-48 h-14 text-base"
+          >
               <RotateCw />
-              Reveal Answer
+              Reveal
           </Button>
-          <Button onClick={handleNextCard} size="lg">
-              Next Question
+          <Button 
+            onClick={handleNextCard} 
+            size="lg"
+            className="rounded-full w-48 h-14 text-base"
+          >
+              Next
               <ArrowRight />
           </Button>
         </div>
