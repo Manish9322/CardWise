@@ -100,7 +100,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </SidebarContent>
         <SidebarFooter className="flex-col items-stretch gap-0">
           <form action={handleLogout} className="group-data-[collapsible=icon]:w-full">
-            <Button variant="ghost" className="w-full justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full">
+            <Button variant="ghost" className="w-full justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:p-0">
               <LogOut className="h-4 w-4" />
               <span className="group-data-[collapsible=icon]:hidden">Logout</span>
             </Button>
