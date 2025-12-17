@@ -66,22 +66,26 @@ export default function RegisterForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" name="username" placeholder="johndoe" required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="m@example.com" required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input id="phone" name="phone" type="tel" placeholder="123-456-7890" required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Address (Optional)</Label>
-            <Input id="address" name="address" placeholder="123 Main St" />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" name="username" placeholder="johndoe" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input id="phone" name="phone" type="tel" placeholder="123-456-7890" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="address">Address (Optional)</Label>
+                    <Input id="address" name="address" placeholder="123 Main St" />
+                </div>
+            </div>
           <Button type="submit" className="w-full">
             Create Account
           </Button>
