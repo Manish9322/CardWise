@@ -63,8 +63,8 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
              <div className="space-y-2">
               {filteredCards.map((card, index) => (
                 <div key={card.id} className={cn("p-4 rounded-lg", index % 2 === 0 ? "bg-muted/50" : "bg-muted")}>
-                  <h4 className="font-semibold">{card.question}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{card.answer}</p>
+                  <h4 className="font-semibold text-sm">{card.question}</h4>
+                  <p className="text-xs text-muted-foreground mt-1">{card.answer}</p>
                 </div>
               ))}
             </div>
