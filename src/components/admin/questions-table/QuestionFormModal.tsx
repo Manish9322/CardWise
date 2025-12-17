@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import type { Card } from '@/lib/definitions';
-import { createCardAction, updateCardAction } from '@/lib/actions/cardActions';
+import { useAddQuestionMutation, useUpdateQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 
@@ -46,6 +46,8 @@ type FormData = z.infer<typeof formSchema>;
 export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!question;
+  const [addQuestion] = useAddQuestionMutation();
+  const [updateQuestion] = useUpdateQuestionMutation();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -74,17 +76,21 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
 
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const formData = new FormData();
-    formData.append('question', data.question);
-    formData.append('answer', data.answer);
-    formData.append('status', data.status);
-    
     try {
         if (isEditing && question) {
-            await updateCardAction(question.id, formData);
+            await updateQuestion({
+              id: question.id,
+              question: data.question,
+              answer: data.answer,
+              status: data.status,
+            }).unwrap();
             toast({ title: "Success", description: "Question updated successfully." });
         } else {
-            await createCardAction(formData);
+            await addQuestion({
+              question: data.question,
+              answer: data.answer,
+              status: data.status,
+            }).unwrap();
             toast({ title: "Success", description: "Question created successfully." });
         }
         onOpenChange(false);

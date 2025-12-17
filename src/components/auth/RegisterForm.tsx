@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -55,11 +57,69 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
-  // In a real app, this would be a server action
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Registering user...");
+    setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirm-password') as string;
+    
+    // Validate password match
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Password Mismatch",
+        description: "Passwords do not match. Please try again.",
+      });
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.get('username'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          password: password,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created. Redirecting to login...",
+        });
+        setTimeout(() => {
+          router.push('/login');
+        }, 1500);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Registration Failed",
+          description: data.error || "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Unable to connect to server. Please try again later.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -122,8 +182,8 @@ export default function RegisterForm() {
                     <Input id="address" name="address" placeholder="123 Main St, Anytown" />
                 </div>
             </div>
-          <Button type="submit" className="w-full">
-            Create Account
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
         <div className="relative my-6">

@@ -4,8 +4,10 @@ export type Card = {
   answer: string;
   status: 'active' | 'inactive';
   createdAt: string;
-  // This is a placeholder as we don't have user data yet
+  updatedAt?: string;
+  userId?: string | null;
   username?: string;
+  userEmail?: string;
 };
 
 export type User = {

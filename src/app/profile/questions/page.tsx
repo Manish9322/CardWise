@@ -1,26 +1,67 @@
+'use client';
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BookCopy, CheckCircle, XCircle } from 'lucide-react';
-import { getAllCards } from '@/lib/actions/cardActions';
+import { BookCopy, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { useGetUserQuestionsQuery } from '@/utils/services/api';
 import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
+import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default async function MyQuestionsPage() {
-  // In a real app, this would fetch questions for the logged-in user
-  const cards = await getAllCards();
+export default function MyQuestionsPage() {
+  const router = useRouter();
+  const { data: cards, error, isLoading, isFetching, refetch } = useGetUserQuestionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
-  const totalQuestions = cards.length;
-  const activeQuestions = cards.filter(c => c.status === 'active').length;
-  const inactiveQuestions = cards.filter(c => c.status === 'inactive').length;
+  useEffect(() => {
+    if (error && 'status' in error && error.status === 401) {
+      router.push('/login');
+    }
+  }, [error, router]);
+
+  if (isLoading) {
+    return <ManageQuestionsSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">My Questions</h1>
+          <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all of your questions.</p>
+        </div>
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load your questions. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const totalQuestions = cards?.length || 0;
+  const activeQuestions = cards?.filter((c: any) => c.status === 'active').length || 0;
+  const inactiveQuestions = cards?.filter((c: any) => c.status === 'inactive').length || 0;
 
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">My Questions</h1>
-        <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all of your questions.</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Questions</h1>
+          <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all of your questions.</p>
+        </div>
+        <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
+          {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          Refresh
+        </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -55,7 +96,7 @@ export default async function MyQuestionsPage() {
         </Card>
       </div>
       
-      <QuestionsTable data={cards} />
+      <QuestionsTable data={cards || []} />
     </div>
   );
 }

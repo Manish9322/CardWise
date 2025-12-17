@@ -15,7 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import type { Card } from '@/lib/definitions';
-import { updateCardAction, deleteCardAction } from '@/lib/actions/cardActions';
+import { useUpdateQuestionMutation, useDeleteQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 type GetColumnsProps = {
@@ -27,6 +27,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
   
   const StatusToggle = ({ row }: { row: any }) => {
     const { toast } = useToast();
+    const [updateQuestion] = useUpdateQuestionMutation();
     const card = row.original;
     const [isActive, setIsActive] = React.useState(card.status === 'active');
 
@@ -34,16 +35,16 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       const newStatus = checked ? 'active' : 'inactive';
       setIsActive(checked);
       
-      const formData = new FormData();
-      formData.append('question', card.question);
-      formData.append('answer', card.answer);
-      formData.append('status', newStatus);
-
       try {
-        await updateCardAction(card.id, formData);
+        await updateQuestion({
+          id: card.id,
+          question: card.question,
+          answer: card.answer,
+          status: newStatus,
+        }).unwrap();
         toast({
           title: 'Status Updated',
-          description: `Card status set to ${newStatus}.`,
+          description: `Question status set to ${newStatus}.`,
         });
       } catch (error) {
         setIsActive(!checked); // Revert on error
@@ -61,20 +62,21 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
   const ActionsCell = ({ row }: { row: any }) => {
     const card = row.original as Card;
     const { toast } = useToast();
+    const [deleteQuestion] = useDeleteQuestionMutation();
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this card?')) return;
+        if (!confirm('Are you sure you want to delete this question?')) return;
         try {
-            await deleteCardAction(card.id);
+            await deleteQuestion(card.id).unwrap();
             toast({
                 title: "Success",
-                description: "Card deleted successfully.",
+                description: "Question deleted successfully.",
             });
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: "Failed to delete card.",
+                description: "Failed to delete question.",
             });
         }
     };
@@ -158,7 +160,10 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
      {
       accessorKey: 'username',
       header: 'Added By',
-      cell: () => 'Admin', // Placeholder as we don't have user data
+      cell: ({ row }) => {
+        const username = row.getValue('username') as string;
+        return <div className="truncate max-w-xs">{username || 'Unknown'}</div>;
+      },
     },
     {
         accessorKey: 'status',

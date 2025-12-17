@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import type { User } from '@/lib/definitions';
-import { createUserAction, updateUserAction } from '@/lib/actions/userActions';
+import { useAddUserMutation, useUpdateUserMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 
@@ -45,6 +45,8 @@ type FormData = z.infer<typeof formSchema>;
 export function UserFormModal({ isOpen, onOpenChange, user }: UserFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!user;
+  const [addUser] = useAddUserMutation();
+  const [updateUser] = useUpdateUserMutation();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -76,26 +78,23 @@ export function UserFormModal({ isOpen, onOpenChange, user }: UserFormModalProps
 
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const formData = new FormData();
-    formData.append('username', data.username);
-    formData.append('email', data.email);
-    formData.append('phone', data.phone);
-    formData.append('status', data.status);
-    
     try {
         if (isEditing && user) {
-            await updateUserAction(user.id, formData);
+            await updateUser({
+              id: user.id,
+              ...data,
+            }).unwrap();
             toast({ title: "Success", description: "User updated successfully." });
         } else {
-            await createUserAction(formData);
+            await addUser(data).unwrap();
             toast({ title: "Success", description: "User created successfully." });
         }
         onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
         toast({
             variant: "destructive",
             title: "Error",
-            description: `Failed to ${isEditing ? 'update' : 'create'} user.`
+            description: error?.data?.error || `Failed to ${isEditing ? 'update' : 'create'} user.`
         });
     }
   };

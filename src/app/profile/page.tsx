@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -6,20 +8,53 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { BookCopy, HelpCircle, User } from 'lucide-react';
-import { getUserById } from '@/lib/db/mock-db';
+import { useGetCurrentUserQuery } from '@/utils/services/api';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
 
-export default async function ProfileOverviewPage() {
-  // In a real app, this would come from the session.
-  // We'll use a mock user for now.
-  const user = await getUserById('usr_2');
-  
-  if (!user) {
-    return <div>User not found.</div>
+export default function ProfileOverviewPage() {
+  const router = useRouter();
+  const { data, isLoading, isError, error } = useGetCurrentUserQuery(undefined);
+
+  useEffect(() => {
+    if (isError && error && 'status' in error && error.status === 401) {
+      router.push('/login');
+    }
+  }, [isError, error, router]);
+
+  if (isLoading) {
+    return <ProfileOverviewSkeleton />;
   }
 
-  // Mock data for questions, in a real app this would be fetched
-  const totalQuestions = user.questionsAdded;
-  const activeQuestions = Math.floor(totalQuestions * 0.75); // Mocked active questions
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load user data. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!data?.success || !data?.user) {
+    return (
+      <div className="space-y-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            User data not found.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const user = data.user;
+  const totalQuestions = user.questionsAdded || 0;
+  const activeQuestions = Math.floor(totalQuestions * 0.75);
 
   return (
     <div className="space-y-6">

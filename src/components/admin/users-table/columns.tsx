@@ -15,7 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import type { User } from '@/lib/definitions';
-import { updateUserAction, deleteUserAction } from '@/lib/actions/userActions';
+import { useUpdateUserMutation, useDeleteUserMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 type GetColumnsProps = {
@@ -27,6 +27,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
   
   const StatusToggle = ({ row }: { row: any }) => {
     const { toast } = useToast();
+    const [updateUser] = useUpdateUserMutation();
     const user = row.original;
     const [isActive, setIsActive] = React.useState(user.status === 'active');
 
@@ -34,17 +35,17 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       const newStatus = checked ? 'active' : 'inactive';
       setIsActive(checked);
       
-      const formData = new FormData();
-      formData.append('username', user.username);
-      formData.append('email', user.email);
-      formData.append('phone', user.phone);
-      formData.append('status', newStatus);
-
       try {
-        await updateUserAction(user.id, formData);
+        await updateUser({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          phone: user.phone,
+          status: newStatus,
+        }).unwrap();
         toast({
-          title: 'Status Updated',
-          description: `User status set to ${newStatus}.`,
+          title: 'Accessibility Updated',
+          description: `User ${newStatus === 'active' ? 'can now' : 'cannot'} add questions.`,
         });
       } catch (error) {
         setIsActive(!checked); // Revert on error
@@ -62,11 +63,12 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
   const ActionsCell = ({ row }: { row: any }) => {
     const user = row.original as User;
     const { toast } = useToast();
+    const [deleteUser] = useDeleteUserMutation();
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this user?')) return;
+        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
         try {
-            await deleteUserAction(user.id);
+            await deleteUser(user.id).unwrap();
             toast({
                 title: "Success",
                 description: "User deleted successfully.",

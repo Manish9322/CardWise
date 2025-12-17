@@ -50,16 +50,25 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["DB", "Questions", "Users"],
+  tagTypes: ["DB", "Questions", "Users", "CurrentUser"],
   endpoints: (builder) => ({
     // DB connection test endpoint
     testDBConnection: builder.query({
       query: () => "/test-db-connection",
       providesTags: ["DB"],
     }),
+    // Current User endpoint
+    getCurrentUser: builder.query({
+      query: () => "/user",
+      providesTags: ["CurrentUser"],
+    }),
     // Questions endpoints
     getQuestions: builder.query({
       query: () => "/questions",
+      providesTags: ["Questions"],
+    }),
+    getUserQuestions: builder.query({
+      query: () => "/user/questions",
       providesTags: ["Questions"],
     }),
     addQuestion: builder.mutation({
@@ -68,7 +77,7 @@ export const api = createApi({
         method: "POST",
         body: question,
       }),
-      invalidatesTags: ["Questions"],
+      invalidatesTags: ["Questions", "CurrentUser"],
     }),
     updateQuestion: builder.mutation({
       query: ({ id, ...question }) => ({
@@ -83,7 +92,7 @@ export const api = createApi({
         url: `/questions/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Questions"],
+      invalidatesTags: ["Questions", "CurrentUser"],
     }),
     // Users endpoints
     getUsers: builder.query({
@@ -118,7 +127,9 @@ export const api = createApi({
 
 export const {
   useTestDBConnectionQuery,
+  useGetCurrentUserQuery,
   useGetQuestionsQuery,
+  useGetUserQuestionsQuery,
   useAddQuestionMutation,
   useUpdateQuestionMutation,
   useDeleteQuestionMutation,
