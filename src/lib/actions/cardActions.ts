@@ -6,7 +6,8 @@ import * as db from '@/lib/db/mock-db';
 import type { Card } from '@/lib/definitions';
 
 export async function getActiveCards() {
-  return await db.getCards(true);
+  const cards = await db.getCards(true);
+  return cards;
 }
 
 export async function getAllCards() {
@@ -30,6 +31,7 @@ export async function createCardAction(formData: FormData) {
 
   await db.createCard(data);
   revalidatePath('/admin');
+  revalidatePath('/');
   redirect('/admin');
 }
 
@@ -43,10 +45,12 @@ export async function updateCardAction(id: string, formData: FormData) {
   await db.updateCard(id, data);
   revalidatePath('/admin');
   revalidatePath(`/admin/cards/${id}/edit`);
+  revalidatePath('/');
   redirect('/admin');
 }
 
 export async function deleteCardAction(id: string) {
   await db.deleteCard(id);
   revalidatePath('/admin');
+  revalidatePath('/');
 }

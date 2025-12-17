@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setCards, setLoading, setError } from '@/lib/store/features/cards/cardsSlice';
-import { getAllCards } from '@/lib/actions/cardActions';
+import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/cards/cardsSlice';
+import { getActiveCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
+import GuessCard from '@/components/game/GuessCard';
 import {
   Accordion,
   AccordionContent,
@@ -21,14 +22,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Menu, BookMarked } from 'lucide-react';
-import { Card as CardType } from '@/lib/definitions';
+import { Terminal, Menu, RotateCw, ArrowRight } from 'lucide-react';
+import type { Card as CardType } from '@/lib/definitions';
 
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4">
+        <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Open questions</span>
         </Button>
@@ -50,17 +51,19 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   )
 }
 
-
 export default function Home() {
   const dispatch = useAppDispatch();
-  const { cards, isLoading, error } = useAppSelector((state) => state.cards);
-  
+  const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
+  const [isFlipped, setIsFlipped] = useState(false);
+
   useEffect(() => {
     const fetchCards = async () => {
       try {
         dispatch(setLoading(true));
-        const allCards = await getAllCards();
-        dispatch(setCards(allCards));
+        const activeCards = await getActiveCards();
+        // Simple shuffle
+        const shuffledCards = activeCards.sort(() => Math.random() - 0.5);
+        dispatch(setCards(shuffledCards));
       } catch (e) {
         dispatch(setError('Failed to load cards.'));
       }
@@ -68,13 +71,20 @@ export default function Home() {
     fetchCards();
   }, [dispatch]);
 
+  const handleNextCard = () => {
+    setIsFlipped(false);
+    // Add a small delay for the flip-back animation before showing the next card
+    setTimeout(() => {
+        dispatch(nextCard());
+    }, 150);
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex flex-col items-center justify-center text-center">
-            <Skeleton className="h-24 w-24 rounded-full" />
-            <Skeleton className="mt-4 h-8 w-64" />
-            <Skeleton className="mt-2 h-6 w-48" />
+        <div className="flex flex-col items-center justify-center text-center w-full max-w-md lg:max-w-2xl">
+            <Skeleton className="h-80 w-full rounded-xl" />
+            <Skeleton className="mt-8 h-12 w-48" />
         </div>
       );
     }
@@ -93,25 +103,39 @@ export default function Home() {
       return (
         <Alert className="max-w-md">
           <Terminal className="h-4 w-4" />
-          <AlertTitle>No Questions Yet!</AlertTitle>
-          <AlertDescription>There are no questions available right now. Check back later!</AlertDescription>
+          <AlertTitle>No Active Questions!</AlertTitle>
+          <AlertDescription>There are no active questions to play right now. Add some in the admin panel!</AlertDescription>
         </Alert>
       );
     }
 
+    const currentCard = cards[currentIndex];
+
     return (
-      <div className="text-center">
-        <BookMarked className="mx-auto h-24 w-24 text-primary" />
-        <h1 className="mt-4 text-3xl font-bold tracking-tight">Ready to Learn?</h1>
-        <p className="mt-2 text-muted-foreground">Click the menu in the top right to see all questions.</p>
+      <div className="flex flex-col items-center justify-center text-center w-full flex-1">
+        <GuessCard 
+            question={currentCard.question}
+            answer={currentCard.answer}
+            isFlipped={isFlipped}
+        />
+        <div className="mt-8 flex gap-4">
+          <Button onClick={() => setIsFlipped(!isFlipped)} variant="outline" size="lg">
+              <RotateCw />
+              Reveal Answer
+          </Button>
+          <Button onClick={handleNextCard} size="lg">
+              Next Question
+              <ArrowRight />
+          </Button>
+        </div>
       </div>
     );
   };
 
   return (
     <div className="flex min-h-screen flex-col">
-       {cards.length > 0 && <QuestionsSidebar cards={cards} />}
-      <main className="flex flex-1 flex-col items-center justify-center p-4 text-center">
+       <QuestionsSidebar cards={cards} />
+      <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
       </main>
       <ThemeToggle />
