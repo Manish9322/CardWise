@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
 import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/cards/cardsSlice';
 import { getActiveCards } from '@/lib/actions/cardActions';
@@ -24,7 +25,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Menu, RotateCw, ArrowRight, Search } from 'lucide-react';
+import { Terminal, Menu, RotateCw, ArrowRight, Search, User } from 'lucide-react';
 import type { Card as CardType } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -197,7 +198,15 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
       </main>
-      <ThemeToggle />
+      <div className="fixed top-4 left-4 z-10 flex flex-col gap-2">
+        <ThemeToggle />
+        <Button asChild variant="ghost" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm">
+          <Link href="/profile">
+            <User className="h-6 w-6" />
+            <span className="sr-only">Go to Profile</span>
+          </Link>
+        </Button>
+      </div>
       <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
           <Button 
             onClick={handleReveal}
