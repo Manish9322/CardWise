@@ -15,7 +15,7 @@ export default function GuessCard({ question, answer, isFlipped }: GuessCardProp
           isFlipped ? 'opacity-0' : 'opacity-100'
         )}
       >
-        <p className="text-2xl md:text-4xl font-semibold text-center leading-tight">{question}</p>
+        <p className="text-2xl md:text-4xl font-semibold text-center leading-tight truncate">{question}</p>
       </div>
       <div
         className={cn(
@@ -23,7 +23,7 @@ export default function GuessCard({ question, answer, isFlipped }: GuessCardProp
           isFlipped ? 'opacity-100' : 'opacity-0'
         )}
       >
-        <p className="text-2xl md:text-4xl font-bold text-primary text-center leading-tight">{answer}</p>
+        <p className="text-2xl md:text-4xl font-bold text-primary text-center leading-tight truncate">{answer}</p>
       </div>
     </div>
   );
