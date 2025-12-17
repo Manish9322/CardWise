@@ -3,19 +3,12 @@ import {
   Activity,
   ArrowUpRight,
   BookCopy,
-  CreditCard,
-  DollarSign,
-  Download,
-  HelpCircle,
-  Menu,
-  Package,
-  Package2,
-  Search,
+  PlusCircle,
   Users,
+  HelpCircle,
+  UserPlus,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -24,27 +17,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { OverviewChart } from '@/components/admin/dashboard/OverviewChart';
 import { RecentUsers } from '@/components/admin/dashboard/RecentUsers';
 import { RecentQuestions } from '@/components/admin/dashboard/RecentQuestions';
+import { LineChartComponent } from '@/components/admin/dashboard/LineChartComponent';
 
 import { getAllCards } from '@/lib/actions/cardActions';
 import { getAllUsers } from '@/lib/actions/userActions';
@@ -115,8 +91,47 @@ export default async function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
+
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/cards/new">
+                    <PlusCircle className="h-6 w-6" />
+                    <span className="text-sm font-medium">New Question</span>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-users">
+                    <UserPlus className="h-6 w-6" />
+                    <span className="text-sm font-medium">Add User</span>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-questions">
+                    <HelpCircle className="h-6 w-6" />
+                    <span className="text-sm font-medium">Manage Questions</span>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-users">
+                    <Users className="h-6 w-6" />
+                    <span className="text-sm font-medium">Manage Users</span>
+                </Link>
+            </Button>
+        </div>
+
+        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Questions Activity</CardTitle>
+              <CardDescription>
+                A line chart showing questions added over time.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LineChartComponent />
+            </CardContent>
+          </Card>
+           <Card>
             <CardHeader className="flex flex-row items-center">
               <div className="grid gap-2">
                 <CardTitle>Users Overview</CardTitle>
@@ -135,10 +150,11 @@ export default async function Dashboard() {
               <OverviewChart />
             </CardContent>
           </Card>
-          <RecentUsers users={userData} />
         </div>
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
+
+        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
             <RecentQuestions questions={cardData} />
+            <RecentUsers users={userData} />
         </div>
       </main>
     </div>
