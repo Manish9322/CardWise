@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Menu, RotateCw, ArrowRight } from 'lucide-react';
 import type { Card as CardType } from '@/lib/definitions';
+import { cn } from '@/lib/utils';
 
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   return (
@@ -55,6 +56,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -72,11 +74,12 @@ export default function Home() {
   }, [dispatch]);
 
   const handleNextCard = () => {
-    setIsFlipped(false);
-    // Add a small delay for the flip-back animation before showing the next card
+    setIsAnimating(true);
     setTimeout(() => {
+        setIsFlipped(false);
         dispatch(nextCard());
-    }, 150);
+        setIsAnimating(false);
+    }, 300);
   };
 
   const renderContent = () => {
@@ -116,11 +119,16 @@ export default function Home() {
 
     return (
       <div className="flex flex-col items-center justify-center text-center w-full flex-1">
-        <GuessCard 
-            question={currentCard.question}
-            answer={currentCard.answer}
-            isFlipped={isFlipped}
-        />
+        <div className={cn(
+            "transition-all duration-300 ease-in-out",
+            isAnimating ? "opacity-0 translate-x-[-50px]" : "opacity-100 translate-x-0"
+        )}>
+            <GuessCard 
+                question={currentCard.question}
+                answer={currentCard.answer}
+                isFlipped={isFlipped}
+            />
+        </div>
         <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
           <Button 
             onClick={() => setIsFlipped(!isFlipped)} 
@@ -135,6 +143,7 @@ export default function Home() {
             onClick={handleNextCard} 
             size="lg"
             className="rounded-full w-48 h-14 text-base"
+            disabled={isAnimating}
           >
               Next
               <ArrowRight />
