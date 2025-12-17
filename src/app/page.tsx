@@ -2,26 +2,65 @@
 
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setCards, nextCard, setLoading, setError } from '@/lib/store/features/cards/cardsSlice';
-import { getActiveCards } from '@/lib/actions/cardActions';
+import { setCards, setLoading, setError } from '@/lib/store/features/cards/cardsSlice';
+import { getAllCards } from '@/lib/actions/cardActions';
 import ThemeToggle from '@/components/common/ThemeToggle';
-import GuessCard from '@/components/game/GuessCard';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, ArrowRight, Eye } from 'lucide-react';
+import { Terminal, Menu, BookMarked } from 'lucide-react';
+import { Card as CardType } from '@/lib/definitions';
+
+function QuestionsSidebar({ cards }: { cards: CardType[] }) {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="absolute top-4 right-4">
+          <Menu className="h-6 w-6" />
+          <span className="sr-only">Open questions</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-full sm:w-[540px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>All Questions</SheetTitle>
+        </SheetHeader>
+        <Accordion type="single" collapsible className="w-full mt-4">
+          {cards.map((card) => (
+            <AccordionItem value={card.id} key={card.id}>
+              <AccordionTrigger>{card.question}</AccordionTrigger>
+              <AccordionContent>{card.answer}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
 
 export default function Home() {
   const dispatch = useAppDispatch();
-  const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const { cards, isLoading, error } = useAppSelector((state) => state.cards);
   
   useEffect(() => {
     const fetchCards = async () => {
       try {
         dispatch(setLoading(true));
-        const activeCards = await getActiveCards();
-        dispatch(setCards(activeCards));
+        const allCards = await getAllCards();
+        dispatch(setCards(allCards));
       } catch (e) {
         dispatch(setError('Failed to load cards.'));
       }
@@ -29,23 +68,13 @@ export default function Home() {
     fetchCards();
   }, [dispatch]);
 
-  const handleAction = () => {
-    if (!isFlipped) {
-      setIsFlipped(true);
-    } else {
-      dispatch(nextCard());
-      setIsFlipped(false);
-    }
-  };
-
-  const currentCard = cards[currentIndex];
-
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="w-full max-w-md lg:max-w-2xl">
-          <Skeleton className="aspect-video w-full rounded-xl" />
-          <Skeleton className="mt-8 h-12 w-40 self-center" />
+        <div className="flex flex-col items-center justify-center text-center">
+            <Skeleton className="h-24 w-24 rounded-full" />
+            <Skeleton className="mt-4 h-8 w-64" />
+            <Skeleton className="mt-2 h-6 w-48" />
         </div>
       );
     }
@@ -60,34 +89,28 @@ export default function Home() {
        );
     }
 
-    if (!currentCard) {
+    if (cards.length === 0) {
       return (
         <Alert className="max-w-md">
           <Terminal className="h-4 w-4" />
-          <AlertTitle>All Done!</AlertTitle>
-          <AlertDescription>You've gone through all the cards. Come back later for more!</AlertDescription>
+          <AlertTitle>No Questions Yet!</AlertTitle>
+          <AlertDescription>There are no questions available right now. Check back later!</AlertDescription>
         </Alert>
       );
     }
 
     return (
-      <>
-        <GuessCard
-          key={currentCard.id}
-          question={currentCard.question}
-          answer={currentCard.answer}
-          isFlipped={isFlipped}
-        />
-        <Button onClick={handleAction} size="lg" className="mt-8 min-w-[150px] bg-primary hover:bg-primary/90">
-          {isFlipped ? <ArrowRight /> : <Eye />}
-          <span className="sr-only">{isFlipped ? 'Next Question' : 'Show Answer'}</span>
-        </Button>
-      </>
+      <div className="text-center">
+        <BookMarked className="mx-auto h-24 w-24 text-primary" />
+        <h1 className="mt-4 text-3xl font-bold tracking-tight">Ready to Learn?</h1>
+        <p className="mt-2 text-muted-foreground">Click the menu in the top right to see all questions.</p>
+      </div>
     );
   };
 
   return (
     <div className="flex min-h-screen flex-col">
+       {cards.length > 0 && <QuestionsSidebar cards={cards} />}
       <main className="flex flex-1 flex-col items-center justify-center p-4 text-center">
         {renderContent()}
       </main>
