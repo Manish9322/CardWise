@@ -22,7 +22,7 @@ export default async function ManageQuestionsPage() {
     <div className="space-y-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
-        <p className="text-muted-foreground">Here you can add, edit, and manage all the questions in the game.</p>
+        <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

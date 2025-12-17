@@ -38,7 +38,7 @@ export default async function Dashboard() {
       <main className="flex flex-1 flex-col gap-4">
         <div className="mb-6">
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">A quick overview of your application's stats.</p>
+            <p className="text-muted-foreground mt-1">A quick overview of your application's stats.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
           <Card>

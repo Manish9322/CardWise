@@ -9,7 +9,7 @@ export default async function EditCardPage({ params }: { params: { id: string } 
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Edit Card</h1>
-        <p className="text-muted-foreground">Update the details for this card.</p>
+        <p className="text-muted-foreground mt-1">Update the details for this card.</p>
       </div>
       <CardForm formAction={updateActionWithId} initialData={card} />
     </div>
