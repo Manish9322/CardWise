@@ -119,6 +119,11 @@ export async function getUsers(): Promise<User[]> {
   return users;
 }
 
+export async function getUserById(id: string): Promise<User | undefined> {
+  await delay(300);
+  return users.find(user => user.id === id);
+}
+
 export async function createUser(data: Omit<User, 'id' | 'createdAt' | 'questionsAdded'>): Promise<User> {
   await delay(500);
   const newUser: User = {

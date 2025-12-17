@@ -6,17 +6,25 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { BookCopy, HelpCircle, User } from 'lucide-react';
+import { getUserById } from '@/lib/db/mock-db';
 
-export default function ProfileOverviewPage() {
-  // Mock data for user stats
-  const totalQuestions = 15;
-  const activeQuestions = 10;
-  const username = "CurrentUser"; // In a real app, this would come from the session
+export default async function ProfileOverviewPage() {
+  // In a real app, this would come from the session.
+  // We'll use a mock user for now.
+  const user = await getUserById('usr_2');
+  
+  if (!user) {
+    return <div>User not found.</div>
+  }
+
+  // Mock data for questions, in a real app this would be fetched
+  const totalQuestions = user.questionsAdded;
+  const activeQuestions = Math.floor(totalQuestions * 0.75); // Mocked active questions
 
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome, {username}!</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Welcome, {user.username}!</h1>
         <p className="text-muted-foreground mt-1">Here's a quick look at your activity.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -26,7 +34,7 @@ export default function ProfileOverviewPage() {
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{username}</div>
+            <div className="text-2xl font-bold">{user.username}</div>
             <p className="text-xs text-muted-foreground">This is your public display name.</p>
           </CardContent>
         </Card>

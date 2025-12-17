@@ -115,11 +115,11 @@ export default function RegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="93228 97948" required />
+                    <Input id="phone" name="phone" type="tel" placeholder="123-456-7890" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="address">Address (Optional)</Label>
-                    <Input id="address" name="address" placeholder="Airoli, Navi Mumbai, Maharashtra" />
+                    <Input id="address" name="address" placeholder="123 Main St, Anytown" />
                 </div>
             </div>
           <Button type="submit" className="w-full">

@@ -95,7 +95,15 @@ export default function LoginForm() {
             <Input id="email" name="email" type="email" placeholder="Enter your mail here" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                    href="#"
+                    className="text-sm font-medium text-primary hover:underline"
+                >
+                    Forgot your password?
+                </Link>
+            </div>
             <div className="relative">
                 <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password here" required />
                 <Button 
@@ -130,18 +138,13 @@ export default function LoginForm() {
           </Button>
         </div>
       </CardContent>
-       <CardFooter className="flex-col items-start gap-4">
-          <div className="text-sm text-muted-foreground">
-            <Link href="#" className="font-medium text-primary hover:underline">
-              Forgot your password?
-            </Link>
-          </div>
-          <div className="text-sm text-muted-foreground">
+       <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link href="/register" className="font-medium text-primary hover:underline">
               Sign up
             </Link>
-          </div>
+          </p>
         </CardFooter>
     </Card>
   );
