@@ -67,7 +67,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
               CardWise
             </Link>
-            <SidebarTrigger className="group-data-[collapsible=icon]:hidden" />
           </div>
         </SidebarHeader>
         <SidebarContent>
