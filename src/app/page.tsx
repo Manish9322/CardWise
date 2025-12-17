@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
 import { setCards, nextCard, setLoading, setError } from '@/lib/store/features/cards/cardsSlice';
 import { getActiveCards } from '@/lib/actions/cardActions';
-import Header from '@/components/common/Header';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Terminal, ArrowRight, Eye } from 'lucide-react';
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -80,7 +79,8 @@ export default function Home() {
           isFlipped={isFlipped}
         />
         <Button onClick={handleAction} size="lg" className="mt-8 min-w-[150px] bg-primary hover:bg-primary/90">
-          {isFlipped ? 'Next Question' : 'Show Answer'}
+          {isFlipped ? <ArrowRight /> : <Eye />}
+          <span className="sr-only">{isFlipped ? 'Next Question' : 'Show Answer'}</span>
         </Button>
       </>
     );
@@ -88,7 +88,6 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex flex-1 flex-col items-center justify-center p-4 text-center">
         {renderContent()}
       </main>
