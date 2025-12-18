@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
@@ -31,116 +30,286 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { logout } from '@/lib/actions/authActions';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import type { User } from '@/lib/definitions';
+import {
+  useGetCurrentUserQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from '@/utils/services/api';
+import { useRouter } from 'next/navigation';
+import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-function AccountSettingsTab() {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Account Information</CardTitle>
-                <CardDescription>Update your personal details here.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input id="username" defaultValue="johndoe" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="johndoe@example.com" />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" type="tel" defaultValue="123-456-7890" />
-                </div>
-            </CardContent>
-            <CardFooter>
-                <Button>Save Changes</Button>
-            </CardFooter>
-        </Card>
-    );
+const accountFormSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+});
+
+type AccountFormData = z.infer<typeof accountFormSchema>;
+
+function AccountSettingsTab({ user }: { user: User }) {
+  const { toast } = useToast();
+  const [updateUser, { isLoading }] = useUpdateUserMutation();
+
+  const form = useForm<AccountFormData>({
+    resolver: zodResolver(accountFormSchema),
+    defaultValues: {
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+    },
+  });
+
+  useEffect(() => {
+    form.reset(user);
+  }, [user, form]);
+
+  const onSubmit: SubmitHandler<AccountFormData> = async (data) => {
+    try {
+      await updateUser({ id: user.id, ...data }).unwrap();
+      toast({ title: 'Success', description: 'Your account has been updated.' });
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error?.data?.error || 'Failed to update account.',
+      });
+    }
+  };
+
+  return (
+    <Card>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+            <CardDescription>Update your personal details here.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="your.email@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input type="tel" placeholder="123-456-7890" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
+  );
 }
 
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+type PasswordFormData = z.infer<typeof passwordFormSchema>;
+
 function PasswordSettingsTab() {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Change Password</CardTitle>
-                <CardDescription>
-                    For your security, we recommend choosing a strong password.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" />
-                </div>
-            </CardContent>
-            <CardFooter>
-                <Button>Update Password</Button>
-            </CardFooter>
-        </Card>
-    );
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  const onSubmit: SubmitHandler<PasswordFormData> = async (data) => {
+    setIsLoading(true);
+    // This is a placeholder for password change logic.
+    // In a real app, you would have an API endpoint for this.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log('Password change data:', data);
+    toast({
+      title: 'Password Updated',
+      description: 'Your password has been changed (simulated).',
+    });
+    form.reset();
+    setIsLoading(false);
+  };
+
+  return (
+    <Card>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+            <CardDescription>
+              For your security, we recommend choosing a strong password.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Updating...' : 'Update Password'}
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
+  );
 }
 
 function PreferencesSettingsTab() {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Preferences</CardTitle>
-                <CardDescription>Manage your notification and theme settings.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                    <div>
-                        <h4 className="font-medium">Email Notifications</h4>
-                        <p className="text-sm text-muted-foreground">Receive emails about your account activity.</p>
-                    </div>
-                    <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                    <div>
-                        <h4 className="font-medium">Marketing Emails</h4>
-                        <p className="text-sm text-muted-foreground">Receive emails about new products and features.</p>
-                    </div>
-                    <Switch />
-                </div>
-                 <div className="flex items-center justify-between rounded-lg border p-4">
-                    <div>
-                        <h4 className="font-medium">Dark Mode</h4>
-                        <p className="text-sm text-muted-foreground">Toggle between light and dark themes.</p>
-                    </div>
-                    <Switch />
-                </div>
-            </CardContent>
-             <CardFooter>
-                <Button>Save Preferences</Button>
-            </CardFooter>
-        </Card>
-    )
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Preferences</CardTitle>
+        <CardDescription>Manage your notification and theme settings.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <h4 className="font-medium">Email Notifications</h4>
+            <p className="text-sm text-muted-foreground">Receive emails about your account activity.</p>
+          </div>
+          <Switch defaultChecked />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <h4 className="font-medium">Marketing Emails</h4>
+            <p className="text-sm text-muted-foreground">Receive emails about new products and features.</p>
+          </div>
+          <Switch />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <h4 className="font-medium">Dark Mode</h4>
+            <p className="text-sm text-muted-foreground">Toggle between light and dark themes.</p>
+          </div>
+          <Switch />
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button>Save Preferences</Button>
+      </CardFooter>
+    </Card>
+  );
 }
 
-function DangerZoneTab() {
+function DangerZoneTab({ userId }: { userId: string }) {
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteUser, { isLoading }] = useDeleteUserMutation();
 
-  const handleDeleteAccount = () => {
-    // In a real app, this would be a server action to delete the user
-    console.log('Deleting account...');
-    setShowDeleteModal(false);
-    toast({
-      title: 'Account Deletion Initiated',
-      description: 'Your account is scheduled for deletion. You will be logged out.',
-      variant: 'destructive',
-    });
-    setTimeout(() => logout(), 2000);
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteUser(userId).unwrap();
+      toast({
+        title: 'Account Deletion Successful',
+        description: 'Your account has been permanently deleted. You will be logged out.',
+        variant: 'destructive',
+      });
+      setTimeout(() => logout(), 2000);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to delete account.',
+      });
+      setShowDeleteModal(false);
+    }
   };
 
   return (
@@ -189,8 +358,12 @@ function DangerZoneTab() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive hover:bg-destructive/90">
-              Yes, delete my account
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={isLoading}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isLoading ? 'Deleting...' : 'Yes, delete my account'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -199,26 +372,33 @@ function DangerZoneTab() {
   );
 }
 
-
 export default function SettingsPage() {
-  // Dynamic tabs configuration (excluding preferences)
-  const dynamicTabs = [
-    {
-      value: 'account',
-      label: 'Account',
-      component: AccountSettingsTab,
-    },
-    {
-      value: 'password',
-      label: 'Password',
-      component: PasswordSettingsTab,
-    },
-    {
-      value: 'danger',
-      label: 'Danger Zone',
-      component: DangerZoneTab,
-    },
-  ];
+  const router = useRouter();
+  const { data, isLoading, isError, error } = useGetCurrentUserQuery(undefined);
+
+  useEffect(() => {
+    if (isError && error && 'status' in error && error.status === 401) {
+      router.push('/login');
+    }
+  }, [isError, error, router]);
+
+  if (isLoading) {
+    return <ProfileOverviewSkeleton />;
+  }
+
+  if (isError || !data?.success || !data?.user) {
+    return (
+      <div className="space-y-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            {isError ? 'Failed to load user data.' : 'User data not found.'} Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const user = data.user;
 
   return (
     <div className="space-y-6">
@@ -231,23 +411,22 @@ export default function SettingsPage() {
 
       <Tabs defaultValue="account" className="space-y-4">
         <TabsList>
-          {dynamicTabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
-        {dynamicTabs.map((tab) => {
-          const TabComponent = tab.component;
-          return (
-            <TabsContent key={tab.value} value={tab.value}>
-              <TabComponent />
-            </TabsContent>
-          );
-        })}
+        <TabsContent value="account">
+          <AccountSettingsTab user={user} />
+        </TabsContent>
+        <TabsContent value="password">
+          <PasswordSettingsTab />
+        </TabsContent>
         <TabsContent value="preferences">
           <PreferencesSettingsTab />
+        </TabsContent>
+        <TabsContent value="danger">
+          <DangerZoneTab userId={user.id} />
         </TabsContent>
       </Tabs>
     </div>
