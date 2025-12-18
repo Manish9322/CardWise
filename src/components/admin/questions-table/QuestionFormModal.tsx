@@ -145,7 +145,7 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
               name="status"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>Visibility</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -156,13 +156,13 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
                         <FormControl>
                           <RadioGroupItem value="active" />
                         </FormControl>
-                        <FormLabel className="font-normal">Active</FormLabel>
+                        <FormLabel className="font-normal">Visible</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="inactive" />
                         </FormControl>
-                        <FormLabel className="font-normal">Inactive</FormLabel>
+                        <FormLabel className="font-normal">Hidden</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>

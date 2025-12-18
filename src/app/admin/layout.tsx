@@ -8,6 +8,7 @@ import {
   Users,
   PanelLeft,
   BookCopy,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -85,6 +86,11 @@ function AdminSidebar() {
                         <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-users')} tooltip="Manage Users">
                             <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                         <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/settings')} tooltip="Settings">
+                            <Link href="/admin/settings"><Settings /><span>Settings</span></Link>
                         </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
