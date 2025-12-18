@@ -9,12 +9,6 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
 import ReactConfetti from 'react-confetti';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -31,11 +25,30 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function QuestionsSidebar({ cards }: { cards: CardType[] }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
   const filteredCards = cards.filter(card =>
-    card.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    card.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    card.question.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+    card.answer.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
   return (
@@ -72,7 +85,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
             </div>
           ) : (
             <div className="text-center text-muted-foreground mt-10">
-              <p>No questions found.</p>
+              <p>No questions found for your search.</p>
             </div>
           )}
         </div>
@@ -237,6 +250,7 @@ export default function Home() {
             onClick={handleReveal}
             size="icon"
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+            disabled={cards.length === 0}
           >
               <RotateCw className="h-6 w-6" />
               <span className="sr-only">{isFlipped ? 'Hide' : 'Reveal'}</span>
@@ -245,7 +259,7 @@ export default function Home() {
             onClick={handleNextCard} 
             size="icon"
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
-            disabled={isAnimating}
+            disabled={isAnimating || cards.length === 0}
           >
               <ArrowRight className="h-6 w-6" />
               <span className="sr-only">Next Card</span>
