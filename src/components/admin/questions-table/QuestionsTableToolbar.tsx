@@ -31,11 +31,13 @@ import {
 interface QuestionsTableToolbarProps<TData> {
   table: Table<TData>;
   handleOpenForm: () => void;
+  filterUsername?: string;
 }
 
 export function QuestionsTableToolbar<TData>({
   table,
   handleOpenForm,
+  filterUsername,
 }: QuestionsTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -50,6 +52,23 @@ export function QuestionsTableToolbar<TData>({
           }
           className="h-9 w-[150px] lg:w-[250px]"
         />
+        {filterUsername && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5">
+            <span className="text-sm text-muted-foreground">Filtering by:</span>
+            <span className="text-sm font-medium">{filterUsername}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 hover:bg-transparent"
+              onClick={() => {
+                table.getColumn('username')?.setFilterValue(undefined);
+                window.history.replaceState({}, '', '/admin/manage-questions');
+              }}
+            >
+              <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+            </Button>
+          </div>
+        )}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-9">

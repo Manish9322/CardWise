@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -14,6 +15,10 @@ import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTabl
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
 
 export default function ManageQuestionsPage() {
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const username = searchParams.get('username');
+  
   const { data: cards, error, isLoading, isFetching, refetch } = useGetQuestionsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -130,7 +135,11 @@ export default function ManageQuestionsPage() {
         </Card>
       </div>
       
-      <QuestionsTable data={cards} />
+      <QuestionsTable 
+        data={cards} 
+        initialFilters={username ? [{ id: 'username', value: username }] : []} 
+        filterUsername={username || undefined}
+      />
     </div>
   );
 }

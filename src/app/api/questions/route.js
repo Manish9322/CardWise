@@ -6,7 +6,7 @@ import User from "../../../../models/user.model.js";
 
 export async function GET() {
   try {
-
+      
     await connectDB();
     
     // Fetch all questions and populate user information

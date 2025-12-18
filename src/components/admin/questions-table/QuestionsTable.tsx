@@ -31,11 +31,13 @@ import { ViewQuestionModal } from './ViewQuestionModal';
 
 interface QuestionsTableProps {
   data: Card[];
+  initialFilters?: ColumnFiltersState;
+  filterUsername?: string;
 }
 
-export function QuestionsTable({ data }: QuestionsTableProps) {
+export function QuestionsTable({ data, initialFilters = [], filterUsername }: QuestionsTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(initialFilters);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   
@@ -80,7 +82,7 @@ export function QuestionsTable({ data }: QuestionsTableProps) {
 
   return (
     <div className="space-y-4">
-      <QuestionsTableToolbar table={table} handleOpenForm={handleOpenForm} />
+      <QuestionsTableToolbar table={table} handleOpenForm={handleOpenForm} filterUsername={filterUsername} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
