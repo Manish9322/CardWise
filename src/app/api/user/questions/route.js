@@ -6,6 +6,15 @@ import Question from "../../../../../models/question.model";
 export async function GET() {
   try {
 
+    const session = await getSession();
+    
+    if (!session?.userId) {
+      return NextResponse.json(
+        { success: false, error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
     
     // Fetch only the logged-in user's questions
