@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Table } from '@tanstack/react-table';
@@ -68,14 +69,20 @@ export function QuestionsTableToolbar<TData>({
                  <div className="grid grid-cols-3 items-center gap-4">
                     <Label htmlFor="status">Status</Label>
                     <Select
-                        value={table.getColumn('status')?.getFilterValue() as string ?? ''}
-                        onValueChange={value => table.getColumn('status')?.setFilterValue(value)}
+                        value={table.getColumn('status')?.getFilterValue() as string ?? 'all'}
+                        onValueChange={value => {
+                            if (value === 'all') {
+                                table.getColumn('status')?.setFilterValue(undefined);
+                            } else {
+                                table.getColumn('status')?.setFilterValue(value);
+                            }
+                        }}
                     >
                         <SelectTrigger className="col-span-2 h-8">
                         <SelectValue placeholder="All" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All</SelectItem>
+                            <SelectItem value="all">All</SelectItem>
                             <SelectItem value="active">Active</SelectItem>
                             <SelectItem value="inactive">Inactive</SelectItem>
                         </SelectContent>
