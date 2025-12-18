@@ -8,15 +8,27 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw } from 'lucide-react';
+import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw, X } from 'lucide-react';
 import { useGetQuestionsQuery } from '@/utils/services/api';
 import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
 export default function ManageQuestionsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const userId = searchParams.get('userId');
+  const username = searchParams.get('username');
+  
   const { data: cards, error, isLoading, isFetching, refetch } = useGetQuestionsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+
+  const clearFilter = () => {
+    router.push('/admin/manage-questions');
+  };
 
   if (isLoading) {
     return <ManageQuestionsSkeleton />;
@@ -40,31 +52,55 @@ export default function ManageQuestionsPage() {
     );
   }
   
-  if (!cards || cards.length === 0) {
+  // Filter cards by userId if provided
+  const filteredCards = userId && cards 
+    ? cards.filter((card: any) => card.userId === userId)
+    : cards;
+
+  if (!filteredCards || filteredCards.length === 0) {
     return (
        <div className="space-y-6">
         <div className="mb-6">
-            <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
-            <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
+                <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+              </div>
+              {userId && username && (
+                <Button variant="outline" size="sm" onClick={clearFilter}>
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Filter
+                </Button>
+              )}
+            </div>
+            {userId && username && (
+              <div className="mt-4">
+                <Badge variant="secondary" className="text-sm">
+                  Showing questions by: {username}
+                </Badge>
+              </div>
+            )}
         </div>
         <div className="text-center py-16 rounded-lg border-2 border-dashed">
             <BookCopy className="mx-auto h-12 w-12 text-muted-foreground" />
             <h2 className="mt-4 text-lg font-semibold">No Questions Found</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-                Get started by adding a new question.
+                {userId ? `${username} hasn't added any questions yet.` : 'Get started by adding a new question.'}
             </p>
-             <div className="mt-4">
-                {/* In a future step, this button will open a modal */}
-                <Button>Add New Question</Button>
-            </div>
+             {!userId && (
+               <div className="mt-4">
+                  {/* In a future step, this button will open a modal */}
+                  <Button>Add New Question</Button>
+              </div>
+             )}
         </div>
       </div>
     );
   }
 
-  const totalQuestions = cards.length;
-  const activeQuestions = cards.filter((c: any) => c.status === 'active').length;
-  const inactiveQuestions = cards.filter((c: any) => c.status === 'inactive').length;
+  const totalQuestions = filteredCards.length;
+  const activeQuestions = filteredCards.filter((c: any) => c.status === 'active').length;
+  const inactiveQuestions = filteredCards.filter((c: any) => c.status === 'inactive').length;
   
   // Dummy data for users, as we don't have user data yet.
   const totalUsers = 1;
@@ -75,6 +111,16 @@ export default function ManageQuestionsPage() {
         <div>
             <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
             <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+            {userId && username && (
+              <div className="mt-2 flex items-center gap-2">
+                <Badge variant="secondary" className="text-sm">
+                  Showing questions by: {username}
+                </Badge>
+                <Button variant="ghost" size="sm" onClick={clearFilter} className="h-6 px-2">
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
         </div>
          <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
             {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
@@ -84,12 +130,16 @@ export default function ManageQuestionsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {userId ? 'User Questions' : 'Total Questions'}
+            </CardTitle>
             <BookCopy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalQuestions}</div>
-            <p className="text-xs text-muted-foreground">All questions in the database</p>
+            <p className="text-xs text-muted-foreground">
+              {userId ? `Questions by ${username}` : 'All questions in the database'}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -124,7 +174,7 @@ export default function ManageQuestionsPage() {
         </Card>
       </div>
       
-      <QuestionsTable data={cards} />
+      <QuestionsTable data={filteredCards} initialUsernameFilter={username || undefined} />
     </div>
   );
 }

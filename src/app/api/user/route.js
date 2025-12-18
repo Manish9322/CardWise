@@ -7,6 +7,7 @@ export async function GET() {
   try {
     const session = await getSession();
     
+    
     if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },

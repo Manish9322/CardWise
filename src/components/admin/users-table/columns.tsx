@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import type { User } from '@/lib/definitions';
 import { useUpdateUserMutation, useDeleteUserMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 type GetColumnsProps = {
   handleOpenForm: (user: User) => void;
@@ -163,6 +164,25 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
     {
         accessorKey: 'questionsAdded',
         header: 'Questions Added',
+        cell: ({ row }) => {
+          const router = useRouter();
+          const user = row.original;
+          const questionsCount = row.getValue('questionsAdded') as number;
+          
+          if (!questionsCount || questionsCount === 0) {
+            return <span className="text-muted-foreground">0</span>;
+          }
+          
+          return (
+            <Button
+              variant="link"
+              className="p-0 h-auto font-normal text-primary hover:underline"
+              onClick={() => router.push(`/admin/manage-questions?userId=${user.id}&username=${encodeURIComponent(user.username)}`)}
+            >
+              {questionsCount}
+            </Button>
+          );
+        },
     },
     {
         accessorKey: 'status',
