@@ -133,21 +133,6 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       enableHiding: false,
     },
     {
-      accessorKey: 'id',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Question ID
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => <div className="truncate w-20">{row.getValue('id')}</div>,
-    },
-    {
       accessorKey: 'question',
       header: 'Question',
       cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('question')}</div>,
@@ -170,7 +155,8 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
         header: 'Visibility',
         cell: ({ row }) => <StatusToggle row={row} />,
         filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id))
+            if (!value) return true;
+            return value === row.getValue(id);
         },
     },
     {

@@ -149,11 +149,6 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       },
     },
     {
-      accessorKey: 'id',
-      header: 'User ID',
-      cell: ({ row }) => <div className="truncate w-20">{row.getValue('id')}</div>,
-    },
-    {
       accessorKey: 'email',
       header: 'Email',
     },
@@ -189,7 +184,8 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
         header: 'Accessibility',
         cell: ({ row }) => <StatusToggle row={row} />,
         filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id))
+            if (!value) return true;
+            return value === row.getValue(id);
         },
     },
     {
