@@ -8,6 +8,11 @@ async function connectDB() {
     return connection;
   }
 
+  if (!config.MONGODB_URL) {
+    console.error("MongoDB connection failed: MONGODB_URL is not defined in your environment.");
+    throw new Error("MongoDB connection failed: MONGODB_URL is not defined.");
+  }
+
   try {
     const newConnection = await mongoose.connect(config.MONGODB_URL, {
       serverSelectionTimeoutMS: 5000, 
