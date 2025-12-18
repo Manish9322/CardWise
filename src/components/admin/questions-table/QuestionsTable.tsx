@@ -31,11 +31,16 @@ import { ViewQuestionModal } from './ViewQuestionModal';
 
 interface QuestionsTableProps {
   data: Card[];
+  initialUsernameFilter?: string;
 }
 
-export function QuestionsTable({ data }: QuestionsTableProps) {
+export function QuestionsTable({ data, initialUsernameFilter }: QuestionsTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    initialUsernameFilter 
+      ? [{ id: 'username', value: initialUsernameFilter }]
+      : []
+  );
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   

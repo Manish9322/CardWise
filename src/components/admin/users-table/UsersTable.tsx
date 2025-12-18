@@ -80,7 +80,7 @@ export function UsersTable({ data }: UsersTableProps) {
 
   return (
     <div className="space-y-4">
-      <UsersTableToolbar table={table} handleOpenForm={handleOpenForm} />
+      <UsersTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

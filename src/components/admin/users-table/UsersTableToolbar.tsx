@@ -1,7 +1,7 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { PlusCircle, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,12 +16,10 @@ import {
 
 interface UsersTableToolbarProps<TData> {
   table: Table<TData>;
-  handleOpenForm: () => void;
 }
 
 export function UsersTableToolbar<TData>({
   table,
-  handleOpenForm,
 }: UsersTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -45,7 +43,7 @@ export function UsersTableToolbar<TData>({
       <div className="flex items-center space-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="ml-auto hidden h-9 lg:flex">
+            <Button variant="outline" size="sm" className="ml-auto h-9">
               View
             </Button>
           </DropdownMenuTrigger>
@@ -72,10 +70,6 @@ export function UsersTableToolbar<TData>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button size="sm" className="h-9" onClick={() => handleOpenForm()}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add User
-        </Button>
       </div>
     </div>
   );
