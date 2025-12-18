@@ -8,6 +8,7 @@ import {
   PanelLeft,
   BookCopy,
   LayoutDashboard,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,6 +73,11 @@ function ProfileSidebar() {
                         <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname.startsWith('/profile/questions')} tooltip="My Questions">
                             <Link href="/profile/questions"><BookCopy /><span>My Questions</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/profile/settings')} tooltip="Settings">
+                            <Link href="/profile/settings"><Settings /><span>Settings</span></Link>
                         </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
