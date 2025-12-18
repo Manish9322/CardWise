@@ -201,6 +201,25 @@ function DangerZoneTab() {
 
 
 export default function SettingsPage() {
+  // Dynamic tabs configuration (excluding preferences)
+  const dynamicTabs = [
+    {
+      value: 'account',
+      label: 'Account',
+      component: AccountSettingsTab,
+    },
+    {
+      value: 'password',
+      label: 'Password',
+      component: PasswordSettingsTab,
+    },
+    {
+      value: 'danger',
+      label: 'Danger Zone',
+      component: DangerZoneTab,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -212,22 +231,23 @@ export default function SettingsPage() {
 
       <Tabs defaultValue="account" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="password">Password</TabsTrigger>
+          {dynamicTabs.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
-        <TabsContent value="account">
-          <AccountSettingsTab />
-        </TabsContent>
-        <TabsContent value="password">
-          <PasswordSettingsTab />
-        </TabsContent>
+        {dynamicTabs.map((tab) => {
+          const TabComponent = tab.component;
+          return (
+            <TabsContent key={tab.value} value={tab.value}>
+              <TabComponent />
+            </TabsContent>
+          );
+        })}
         <TabsContent value="preferences">
           <PreferencesSettingsTab />
-        </TabsContent>
-        <TabsContent value="danger">
-            <DangerZoneTab />
         </TabsContent>
       </Tabs>
     </div>
