@@ -24,6 +24,9 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useState } from 'react';
+import { LogoutConfirmationModal } from '@/components/common/LogoutConfirmationModal';
+import { logout } from '@/lib/actions/authActions';
 
 function SidebarToggle() {
     const { state, toggleSidebar } = useSidebar();
@@ -49,37 +52,45 @@ function SidebarToggle() {
 function ProfileSidebar() {
     const pathname = usePathname();
     const { state } = useSidebar();
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     return (
-        <Sidebar collapsible="icon">
-            <SidebarHeader className="p-2">
-                <Link href="/" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
-                 CardWise
-                </Link>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/profile'} tooltip="Overview">
-                        <Link href="/profile"><LayoutDashboard /><span>Overview</span></Link>
+        <>
+            <Sidebar collapsible="icon">
+                <SidebarHeader className="p-2">
+                    <Link href="/" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
+                    CardWise
+                    </Link>
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname === '/profile'} tooltip="Overview">
+                            <Link href="/profile"><LayoutDashboard /><span>Overview</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/profile/questions')} tooltip="My Questions">
+                            <Link href="/profile/questions"><BookCopy /><span>My Questions</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarContent>
+                <SidebarFooter className="flex-col items-stretch gap-2 border-t p-2">
+                    <SidebarMenuButton onClick={() => setIsLogoutModalOpen(true)} tooltip="Logout">
+                        <LogOut /><span>Logout</span>
                     </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith('/profile/questions')} tooltip="My Questions">
-                        <Link href="/profile/questions"><BookCopy /><span>My Questions</span></Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarContent>
-            <SidebarFooter className="flex-col items-stretch gap-2 border-t p-2">
-            <SidebarMenuButton asChild tooltip="Logout">
-                <Link href="/login"><LogOut /><span>Logout</span></Link>
-            </SidebarMenuButton>
-            <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center' : 'justify-end')}>
-                <SidebarToggle />
-            </div>
-            </SidebarFooter>
-      </Sidebar>
+                <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center' : 'justify-end')}>
+                    <SidebarToggle />
+                </div>
+                </SidebarFooter>
+          </Sidebar>
+          <LogoutConfirmationModal
+            isOpen={isLogoutModalOpen}
+            onOpenChange={setIsLogoutModalOpen}
+            onConfirm={logout}
+          />
+        </>
     );
 }
 

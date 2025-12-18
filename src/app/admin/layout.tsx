@@ -25,9 +25,10 @@ import {
 import { logout } from '@/lib/actions/authActions';
 import { useAppDispatch } from '@/lib/store/hooks';
 import { setAuthenticated } from '@/lib/store/features/auth/authSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { LogoutConfirmationModal } from '@/components/common/LogoutConfirmationModal';
 
 function SidebarToggle() {
     const { state, toggleSidebar } = useSidebar();
@@ -54,6 +55,7 @@ function AdminSidebar() {
     const pathname = usePathname();
     const dispatch = useAppDispatch();
     const { state } = useSidebar();
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -61,42 +63,47 @@ function AdminSidebar() {
     };
 
     return (
-        <Sidebar collapsible="icon">
-            <SidebarHeader className="p-2">
-                <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
-                CardWise
-                </Link>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip="Dashboard">
-                        <Link href="/admin"><Home /><span>Dashboard</span></Link>
+        <>
+            <Sidebar collapsible="icon">
+                <SidebarHeader className="p-2">
+                    <Link href="/admin" className="text-xl font-bold text-primary pl-2 group-data-[collapsible=icon]:hidden">
+                    CardWise
+                    </Link>
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip="Dashboard">
+                            <Link href="/admin"><Home /><span>Dashboard</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-questions')} tooltip="Manage Questions">
+                            <Link href="/admin/manage-questions"><BookCopy /><span>Manage Questions</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-users')} tooltip="Manage Users">
+                            <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarContent>
+                <SidebarFooter className="flex-col items-stretch gap-2 border-t p-2">
+                    <SidebarMenuButton onClick={() => setIsLogoutModalOpen(true)} tooltip="Logout">
+                        <LogOut /><span>Logout</span>
                     </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-questions')} tooltip="Manage Questions">
-                        <Link href="/admin/manage-questions"><BookCopy /><span>Manage Questions</span></Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/manage-users')} tooltip="Manage Users">
-                        <Link href="/admin/manage-users"><Users /><span>Manage Users</span></Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarContent>
-            <SidebarFooter className="flex-col items-stretch gap-2 border-t p-2">
-            <form action={handleLogout} className="w-full">
-                <SidebarMenuButton asChild tooltip="Logout">
-                    <button type="submit" className="w-full"><LogOut /><span>Logout</span></button>
-                </SidebarMenuButton>
-            </form>
-            <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center' : 'justify-end')}>
-                <SidebarToggle />
-            </div>
-            </SidebarFooter>
-      </Sidebar>
+                <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center' : 'justify-end')}>
+                    <SidebarToggle />
+                </div>
+                </SidebarFooter>
+          </Sidebar>
+           <LogoutConfirmationModal
+                isOpen={isLogoutModalOpen}
+                onOpenChange={setIsLogoutModalOpen}
+                onConfirm={handleLogout}
+            />
+        </>
     );
 }
 
