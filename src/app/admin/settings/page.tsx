@@ -19,18 +19,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { logout } from '@/lib/actions/authActions';
+import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
+import { setMaintenanceMode } from '@/lib/store/features/app/appSlice';
+
 
 function AccountSettingsTab() {
     return (
@@ -57,6 +49,18 @@ function AccountSettingsTab() {
 }
 
 function GeneralSettingsTab() {
+    const dispatch = useAppDispatch();
+    const isMaintenanceMode = useAppSelector((state) => state.app.isMaintenanceMode);
+    const { toast } = useToast();
+
+    const handleMaintenanceToggle = (checked: boolean) => {
+        dispatch(setMaintenanceMode(checked));
+        toast({
+            title: 'Settings Updated',
+            description: `Maintenance mode has been ${checked ? 'enabled' : 'disabled'}.`,
+        });
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -71,7 +75,10 @@ function GeneralSettingsTab() {
                         <h4 className="font-medium">Site Maintenance</h4>
                         <p className="text-sm text-muted-foreground">Put the site in maintenance mode.</p>
                     </div>
-                    <Switch />
+                    <Switch
+                        checked={isMaintenanceMode}
+                        onCheckedChange={handleMaintenanceToggle}
+                    />
                 </div>
                  <div className="flex items-center justify-between rounded-lg border p-4">
                     <div>

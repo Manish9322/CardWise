@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import themeReducer from './features/theme/themeSlice';
 import cardsReducer from './features/cards/cardsSlice';
 import authReducer from './features/auth/authSlice';
+import appReducer from './features/app/appSlice';
 import { api } from '@/utils/services/api';
 
 export const makeStore = () => {
@@ -10,6 +11,7 @@ export const makeStore = () => {
       theme: themeReducer,
       cards: cardsReducer,
       auth: authReducer,
+      app: appReducer,
       [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
