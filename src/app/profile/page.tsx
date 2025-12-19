@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BookCopy, HelpCircle, User, Settings, Check, Star, Activity, TrendingUp, BarChart, Users as UsersIcon } from 'lucide-react';
+import { BookCopy, HelpCircle, User, Settings, Check, Star, Activity, TrendingUp, BarChart, Users as UsersIcon, Terminal, RefreshCw } from 'lucide-react';
 import { useGetCurrentUserQuery } from '@/utils/services/api';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -15,10 +15,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
 import { LineChartComponent } from '@/components/admin/dashboard/LineChartComponent';
 import { OverviewChart } from '@/components/admin/dashboard/OverviewChart';
+import { Button } from '@/components/ui/button';
 
 export default function ProfileOverviewPage() {
   const router = useRouter();
-  const { data, isLoading, isError, error } = useGetCurrentUserQuery(undefined);
+  const { data, isLoading, isError, error, refetch } = useGetCurrentUserQuery(undefined);
 
   useEffect(() => {
     if (isError && error && 'status' in error && error.status === 401) {
@@ -32,24 +33,35 @@ export default function ProfileOverviewPage() {
 
   if (isError) {
     return (
-      <div className="space-y-6">
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load user data. Please try again later.
-          </AlertDescription>
-        </Alert>
+      <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+          <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h2 className="mt-4 text-lg font-semibold text-destructive">Error Loading Your Profile</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            There was a problem loading your user data. Please try again.
+          </p>
+          <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
 
   if (!data?.success || !data?.user) {
     return (
-      <div className="space-y-6">
-        <Alert variant="destructive">
-          <AlertDescription>
-            User data not found.
-          </AlertDescription>
-        </Alert>
+       <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+            <User className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold">User Not Found</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                We couldn't find your user data. Please try logging in again.
+            </p>
+            <Button onClick={() => router.push('/login')} variant="outline" size="sm" className="mt-4">
+                Go to Login
+            </Button>
+        </div>
       </div>
     );
   }
