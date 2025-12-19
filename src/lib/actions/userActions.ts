@@ -1,10 +1,29 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import * as db from '@/lib/db/mock-db';
+import type { User } from '@/lib/definitions';
 
-export async function getAllUsers() {
-  return await db.getUsers();
+export async function getAllUsers(): Promise<User[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/users`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch users:', response.statusText);
+      return [];
+    }
+
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
 }
 
 export async function createUserAction(formData: FormData) {
@@ -14,8 +33,27 @@ export async function createUserAction(formData: FormData) {
     phone: formData.get('phone') as string,
     status: (formData.get('status') as 'active' | 'inactive') || 'inactive',
   };
-  await db.createUser(data);
-  revalidatePath('/admin/manage-users');
+  
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create user');
+    }
+
+    revalidatePath('/admin/manage-users');
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 }
 
 export async function updateUserAction(id: string, formData: FormData) {
@@ -25,11 +63,47 @@ export async function updateUserAction(id: string, formData: FormData) {
     phone: formData.get('phone') as string,
     status: formData.get('status') as 'active' | 'inactive',
   };
-  await db.updateUser(id, data);
-  revalidatePath('/admin/manage-users');
+  
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/users/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update user');
+    }
+
+    revalidatePath('/admin/manage-users');
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
 }
 
 export async function deleteUserAction(id: string) {
-  await db.deleteUser(id);
-  revalidatePath('/admin/manage-users');
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/users/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete user');
+    }
+
+    revalidatePath('/admin/manage-users');
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
 }

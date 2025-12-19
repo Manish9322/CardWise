@@ -1,7 +1,8 @@
+
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { PlusCircle, SlidersHorizontal } from 'lucide-react';
+import { PlusCircle, SlidersHorizontal, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,15 +14,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface QuestionsTableToolbarProps<TData> {
   table: Table<TData>;
   handleOpenForm: () => void;
+  filterUsername?: string;
 }
 
 export function QuestionsTableToolbar<TData>({
   table,
   handleOpenForm,
+  filterUsername,
 }: QuestionsTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -36,11 +52,87 @@ export function QuestionsTableToolbar<TData>({
           }
           className="h-9 w-[150px] lg:w-[250px]"
         />
-        {/* Placeholder for advanced filters */}
-        <Button variant="outline" size="sm" className="h-9">
-          <SlidersHorizontal className="mr-2 h-4 w-4" />
-          Filters
-        </Button>
+        {filterUsername && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5">
+            <span className="text-sm text-muted-foreground">Filtering by:</span>
+            <span className="text-sm font-medium">{filterUsername}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 hover:bg-transparent"
+              onClick={() => {
+                table.getColumn('username')?.setFilterValue(undefined);
+                window.history.replaceState({}, '', '/admin/manage-questions');
+              }}
+            >
+              <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+            </Button>
+          </div>
+        )}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <SlidersHorizontal className="mr-2 h-4 w-4" />
+              Filters
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="start">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <h4 className="font-medium leading-none">Advanced Filters</h4>
+                <p className="text-sm text-muted-foreground">
+                  Filter questions by visibility or user.
+                </p>
+              </div>
+              <div className="grid gap-2">
+                 <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="status">Visibility</Label>
+                    <Select
+                        value={table.getColumn('status')?.getFilterValue() as string ?? 'all'}
+                        onValueChange={value => {
+                            if (value === 'all') {
+                                table.getColumn('status')?.setFilterValue(undefined);
+                            } else {
+                                table.getColumn('status')?.setFilterValue(value);
+                            }
+                        }}
+                    >
+                        <SelectTrigger className="col-span-2 h-8">
+                        <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="active">Visible</SelectItem>
+                            <SelectItem value="inactive">Hidden</SelectItem>
+                        </SelectContent>
+                    </Select>
+                 </div>
+                 <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="username">Added By</Label>
+                    <Input
+                        id="username"
+                        placeholder="Username"
+                        value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
+                        onChange={(event) =>
+                            table.getColumn('username')?.setFilterValue(event.target.value)
+                        }
+                        className="col-span-2 h-8"
+                    />
+                 </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {isFiltered && (
+          <Button
+            variant="ghost"
+            onClick={() => table.resetColumnFilters()}
+            className="h-9 px-2 lg:px-3"
+          >
+            Clear Filters
+            <X className="ml-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
       <div className="flex items-center space-x-2">
         <DropdownMenu>

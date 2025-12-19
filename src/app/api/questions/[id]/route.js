@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import connectDB from "@/utils/db";
-import Question from "../../../../../../models/question.model.js";
+import Question from "../../../../../models/question.model.js";
 
 export async function PUT(request, { params }) {
   try {
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { question, answer, status } = body;
 
@@ -66,7 +66,7 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
 
-    const { id } = params;
+    const { id } = await params;
 
     await connectDB();
 

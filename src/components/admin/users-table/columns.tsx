@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import type { User } from '@/lib/definitions';
 import { useUpdateUserMutation, useDeleteUserMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 type GetColumnsProps = {
   handleOpenForm: (user: User) => void;
@@ -148,11 +149,6 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
       },
     },
     {
-      accessorKey: 'id',
-      header: 'User ID',
-      cell: ({ row }) => <div className="truncate w-20">{row.getValue('id')}</div>,
-    },
-    {
       accessorKey: 'email',
       header: 'Email',
     },
@@ -163,13 +159,33 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
     {
         accessorKey: 'questionsAdded',
         header: 'Questions Added',
+        cell: ({ row }) => {
+          const router = useRouter();
+          const user = row.original;
+          const questionsCount = row.getValue('questionsAdded') as number;
+          
+          if (!questionsCount || questionsCount === 0) {
+            return <span className="text-muted-foreground">0</span>;
+          }
+          
+          return (
+            <Button
+              variant="link"
+              className="p-0 h-auto font-normal text-primary hover:underline"
+              onClick={() => router.push(`/admin/manage-questions?userId=${user.id}&username=${encodeURIComponent(user.username)}`)}
+            >
+              {questionsCount}
+            </Button>
+          );
+        },
     },
     {
         accessorKey: 'status',
         header: 'Accessibility',
         cell: ({ row }) => <StatusToggle row={row} />,
         filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id))
+            if (!value) return true;
+            return value === row.getValue(id);
         },
     },
     {

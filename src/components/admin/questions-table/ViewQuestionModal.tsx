@@ -38,9 +38,9 @@ export function ViewQuestionModal({ isOpen, onOpenChange, question }: ViewQuesti
                 <p className="text-sm text-muted-foreground p-3 bg-muted rounded-md">{question.answer}</p>
             </div>
             <div className="flex items-center gap-4">
-                <h4 className="font-semibold">Status</h4>
+                <h4 className="font-semibold">Visibility</h4>
                 <Badge variant={question.status === 'active' ? 'default' : 'secondary'} className={question.status === 'active' ? 'bg-green-600' : ''}>
-                    {question.status}
+                    {question.status === 'active' ? 'Visible' : 'Hidden'}
                 </Badge>
             </div>
             <div className="flex items-center gap-4">
@@ -49,7 +49,7 @@ export function ViewQuestionModal({ isOpen, onOpenChange, question }: ViewQuesti
             </div>
              <div className="flex items-center gap-4">
                 <h4 className="font-semibold">Added By</h4>
-                <p className="text-sm text-muted-foreground">Admin</p>
+                <p className="text-sm text-muted-foreground">{question.username || 'Admin'}</p>
             </div>
         </div>
         <DialogFooter>

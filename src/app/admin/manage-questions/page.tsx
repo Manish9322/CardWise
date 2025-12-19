@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -8,12 +9,16 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw } from 'lucide-react';
+import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw, X } from 'lucide-react';
 import { useGetQuestionsQuery } from '@/utils/services/api';
 import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
 
 export default function ManageQuestionsPage() {
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const username = searchParams.get('username');
+  
   const { data: cards, error, isLoading, isFetching, refetch } = useGetQuestionsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -44,8 +49,12 @@ export default function ManageQuestionsPage() {
     return (
        <div className="space-y-6">
         <div className="mb-6">
-            <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
-            <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
+                <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+              </div>
+            </div>
         </div>
         <div className="text-center py-16 rounded-lg border-2 border-dashed">
             <BookCopy className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -54,7 +63,7 @@ export default function ManageQuestionsPage() {
                 Get started by adding a new question.
             </p>
              <div className="mt-4">
-                {/* In a future step, this button will open a modal */}
+                {/* This button is handled inside the QuestionsTable component */}
                 <Button>Add New Question</Button>
             </div>
         </div>
@@ -89,7 +98,9 @@ export default function ManageQuestionsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalQuestions}</div>
-            <p className="text-xs text-muted-foreground">All questions in the database</p>
+            <p className="text-xs text-muted-foreground">
+              All questions in the database
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -124,7 +135,11 @@ export default function ManageQuestionsPage() {
         </Card>
       </div>
       
-      <QuestionsTable data={cards} />
+      <QuestionsTable 
+        data={cards} 
+        initialFilters={username ? [{ id: 'username', value: username }] : []} 
+        filterUsername={username || undefined}
+      />
     </div>
   );
 }

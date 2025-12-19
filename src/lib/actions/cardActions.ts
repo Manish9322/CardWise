@@ -1,25 +1,79 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import * as db from '@/lib/db/mock-db';
 import type { Card } from '@/lib/definitions';
 
-export async function getActiveCards() {
-  const cards = await db.getCards(true);
-  return cards;
+// Fetch cards from the API route
+export async function getActiveCards(): Promise<Card[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch active cards:', response.statusText);
+      return [];
+    }
+
+    const allQuestions = await response.json();
+    
+    // Filter only active cards
+    const activeCards = allQuestions.filter((card: Card) => card.status === 'active');
+    
+    return activeCards;
+  } catch (error) {
+    console.error('Error fetching active cards:', error);
+    return [];
+  }
 }
 
-export async function getAllCards() {
-  return await db.getCards(false);
+export async function getAllCards(): Promise<Card[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch all cards:', response.statusText);
+      return [];
+    }
+
+    const questions = await response.json();
+    return questions;
+  } catch (error) {
+    console.error('Error fetching all cards:', error);
+    return [];
+  }
 }
 
-export async function getCard(id: string) {
-  const card = await db.getCardById(id);
-  if (!card) {
+export async function getCard(id: string): Promise<Card> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions/${id}`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Card not found');
+    }
+
+    const card = await response.json();
+    return card;
+  } catch (error) {
+    console.error('Error fetching card:', error);
     throw new Error('Card not found');
   }
-  return card;
 }
 
 export async function createCardAction(formData: FormData) {
@@ -29,11 +83,28 @@ export async function createCardAction(formData: FormData) {
     status: (formData.get('status') as 'active' | 'inactive') || 'inactive',
   };
 
-  await db.createCard(data);
-  revalidatePath('/admin');
-  revalidatePath('/admin/manage-questions');
-  revalidatePath('/');
-  // Don't redirect for modal forms
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create card');
+    }
+
+    revalidatePath('/admin');
+    revalidatePath('/admin/manage-questions');
+    revalidatePath('/');
+  } catch (error) {
+    console.error('Error creating card:', error);
+    throw error;
+  }
 }
 
 export async function updateCardAction(id: string, formData: FormData) {
@@ -43,17 +114,51 @@ export async function updateCardAction(id: string, formData: FormData) {
     status: formData.get('status') as 'active' | 'inactive',
   };
 
-  await db.updateCard(id, data);
-  revalidatePath('/admin');
-  revalidatePath('/admin/manage-questions');
-  revalidatePath(`/admin/cards/${id}/edit`);
-  revalidatePath('/');
-  // We don't redirect here so the modal can close itself.
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update card');
+    }
+
+    revalidatePath('/admin');
+    revalidatePath('/admin/manage-questions');
+    revalidatePath(`/admin/cards/${id}/edit`);
+    revalidatePath('/');
+  } catch (error) {
+    console.error('Error updating card:', error);
+    throw error;
+  }
 }
 
 export async function deleteCardAction(id: string) {
-  await db.deleteCard(id);
-  revalidatePath('/admin');
-  revalidatePath('/admin/manage-questions');
-  revalidatePath('/');
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/questions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete card');
+    }
+
+    revalidatePath('/admin');
+    revalidatePath('/admin/manage-questions');
+    revalidatePath('/');
+  } catch (error) {
+    console.error('Error deleting card:', error);
+    throw error;
+  }
 }

@@ -1,19 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setCards, setLoading, setError, nextCard } from '@/lib/store/features/cards/cardsSlice';
-import { getActiveCards } from '@/lib/actions/cardActions';
+import { useGetQuestionsQuery } from '@/utils/services/api';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
+import GuessCardSkeleton from '@/components/game/GuessCardSkeleton';
+import QuestionsSidebarSkeleton from '@/components/game/QuestionsSidebarSkeleton';
 import ReactConfetti from 'react-confetti';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import {
   Sheet,
   SheetContent,
@@ -23,19 +17,42 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, Menu, RotateCw, ArrowRight, Search, User, Database } from 'lucide-react';
-import type { Card as CardType } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
-function QuestionsSidebar({ cards }: { cards: CardType[] }) {
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+function QuestionsSidebar({ allQuestions, isLoading }: { allQuestions: any[]; isLoading: boolean }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const filteredCards = cards.filter(card =>
-    card.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    card.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Filter only active questions for the sidebar
+  const activeQuestions = useMemo(() => {
+    if (!allQuestions) return [];
+    return allQuestions.filter((card: any) => card.status === 'active');
+  }, [allQuestions]);
+
+  const filteredCards = activeQuestions.filter(card =>
+    card.question.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+    card.answer.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
   return (
@@ -58,10 +75,13 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            disabled={isLoading}
           />
         </div>
-        <div className="overflow-y-auto mt-4 flex-1">
-          {filteredCards.length > 0 ? (
+        <div className="overflow-y-auto mt-4 flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {isLoading ? (
+            <QuestionsSidebarSkeleton />
+          ) : filteredCards.length > 0 ? (
              <div className="space-y-2">
               {filteredCards.map((card, index) => (
                 <div key={card.id} className={cn("p-4 rounded-lg", index % 2 === 0 ? "bg-muted/50" : "bg-muted")}>
@@ -72,7 +92,7 @@ function QuestionsSidebar({ cards }: { cards: CardType[] }) {
             </div>
           ) : (
             <div className="text-center text-muted-foreground mt-10">
-              <p>No questions found.</p>
+              <p>No questions found for your search.</p>
             </div>
           )}
         </div>
@@ -107,27 +127,22 @@ function ConfettiWrapper({ onComplete }: { onComplete: () => void }) {
 }
 
 export default function Home() {
-  const dispatch = useAppDispatch();
-  const { cards, currentIndex, isLoading, error } = useAppSelector((state) => state.cards);
+  // Use RTK Query to fetch questions
+  const { data: allQuestions, isLoading, error: queryError } = useGetQuestionsQuery(undefined);
+  
+  // Filter and shuffle active cards
+  const cards = useMemo(() => {
+    if (!allQuestions) return [];
+    const activeCards = allQuestions.filter((card: any) => card.status === 'active');
+    // Shuffle the cards
+    return activeCards.sort(() => Math.random() - 0.5);
+  }, [allQuestions]);
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        dispatch(setLoading(true));
-        const activeCards = await getActiveCards();
-        // Simple shuffle
-        const shuffledCards = activeCards.sort(() => Math.random() - 0.5);
-        dispatch(setCards(shuffledCards));
-      } catch (e) {
-        dispatch(setError('Failed to load cards.'));
-      }
-    };
-    fetchCards();
-  }, [dispatch]);
 
   const handleReveal = () => {
     const newFlippedState = !isFlipped;
@@ -141,7 +156,9 @@ export default function Home() {
     setIsAnimating(true);
     setTimeout(() => {
         setIsFlipped(false);
-        dispatch(nextCard());
+        if (cards.length > 0) {
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
+        }
         setIsAnimating(false);
     }, 300);
   };
@@ -166,18 +183,18 @@ export default function Home() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
-            <Skeleton className="h-[24rem] w-full rounded-xl" />
+        <div className="flex flex-col items-center justify-center text-center w-full flex-1">
+          <GuessCardSkeleton />
         </div>
       );
     }
 
-    if (error) {
+    if (queryError) {
        return (
         <Alert variant="destructive" className="max-w-md">
           <Terminal className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>Failed to load questions. Please try again later.</AlertDescription>
         </Alert>
        );
     }
@@ -214,7 +231,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col overflow-hidden">
        {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex items-center gap-2">
-        <QuestionsSidebar cards={cards} />
+        <QuestionsSidebar allQuestions={allQuestions || []} isLoading={isLoading} />
        </div>
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
@@ -237,6 +254,7 @@ export default function Home() {
             onClick={handleReveal}
             size="icon"
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+            disabled={cards.length === 0}
           >
               <RotateCw className="h-6 w-6" />
               <span className="sr-only">{isFlipped ? 'Hide' : 'Reveal'}</span>
@@ -245,7 +263,7 @@ export default function Home() {
             onClick={handleNextCard} 
             size="icon"
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
-            disabled={isAnimating}
+            disabled={isAnimating || cards.length === 0}
           >
               <ArrowRight className="h-6 w-6" />
               <span className="sr-only">Next Card</span>

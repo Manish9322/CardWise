@@ -6,15 +6,7 @@ import User from "../../../../models/user.model.js";
 
 export async function GET() {
   try {
-    const session = await getSession();
-
-    if (!session?.userId) {
-      return NextResponse.json(
-        { success: false, error: "Not authenticated" },
-        { status: 401 }
-      );
-    }
-
+      
     await connectDB();
 
     // Fetch all questions and populate user information
