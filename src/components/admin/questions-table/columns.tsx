@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -135,27 +136,29 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
     {
       accessorKey: 'question',
       header: 'Question',
-      cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('question')}</div>,
+      cell: ({ row }) => <div className="truncate max-w-[200px] sm:max-w-xs">{row.getValue('question')}</div>,
     },
     {
       accessorKey: 'answer',
       header: 'Answer',
       cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('answer')}</div>,
+      enableHiding: true,
     },
      {
       accessorKey: 'username',
       header: 'Added By',
       cell: ({ row }) => {
         const username = row.getValue('username') as string;
-        return <div className="truncate max-w-xs">{username || 'Unknown'}</div>;
+        return <div className="truncate max-w-[100px]">{username || 'Unknown'}</div>;
       },
+       enableHiding: true,
     },
     {
         accessorKey: 'status',
         header: 'Visibility',
         cell: ({ row }) => <StatusToggle row={row} />,
         filterFn: (row, id, value) => {
-            if (!value) return true;
+            if (value === 'all') return true;
             return value === row.getValue(id);
         },
     },
