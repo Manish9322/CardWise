@@ -5,8 +5,11 @@ export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const sessionCookie = req.cookies.get('session')?.value;
 
-  // For both admin and profile routes, check for a valid session
-  if (path.startsWith('/admin') || path.startsWith('/profile')) {
+  const isProtectedRoute = path.startsWith('/admin') || path.startsWith('/profile');
+  const isLoginPage = path === '/admin/login' || path === '/login';
+
+  // If it's a protected route but not the login page itself
+  if (isProtectedRoute && !isLoginPage) {
     if (!sessionCookie) {
       const url = req.nextUrl.clone();
       url.pathname = path.startsWith('/admin') ? '/admin/login' : '/login';
@@ -14,13 +17,11 @@ export default async function middleware(req: NextRequest) {
     }
 
     try {
-      // Decrypt the session to ensure it's valid
       const session = await decrypt(sessionCookie);
       if (!session?.userId) {
         throw new Error('Invalid session');
       }
     } catch (e) {
-      // If decryption fails or session is invalid, redirect to the appropriate login page
       const url = req.nextUrl.clone();
       url.pathname = path.startsWith('/admin') ? '/admin/login' : '/login';
       return NextResponse.redirect(url);
