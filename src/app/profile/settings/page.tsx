@@ -50,6 +50,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Eye, EyeOff } from 'lucide-react';
 
 const accountFormSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -165,6 +166,9 @@ type PasswordFormData = z.infer<typeof passwordFormSchema>;
 function PasswordSettingsTab() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(passwordFormSchema),
@@ -207,7 +211,18 @@ function PasswordSettingsTab() {
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <div className="relative">
+                      <Input type={showCurrentPassword ? 'text' : 'password'} {...field} />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                        onClick={() => setShowCurrentPassword((prev) => !prev)}
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -220,7 +235,18 @@ function PasswordSettingsTab() {
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                     <div className="relative">
+                      <Input type={showNewPassword ? 'text' : 'password'} {...field} />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                      >
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -233,7 +259,18 @@ function PasswordSettingsTab() {
                 <FormItem>
                   <FormLabel>Confirm New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <div className="relative">
+                      <Input type={showConfirmPassword ? 'text' : 'password'} {...field} />
+                       <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
