@@ -22,7 +22,7 @@ export async function GET() {
       answer: q.answer,
       status: q.status,
       userId: q.userId?._id?.toString() || null,
-      username: q.userId?.username || "Unknown",
+      username: q.userId?.username || "Admin",
       userEmail: q.userId?.email || "",
       createdAt: q.createdAt,
       updatedAt: q.updatedAt,
@@ -61,39 +61,47 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Check if user is active (has accessibility)
-    const user = await User.findById(session.userId).select("status").lean();
+    // If it's a regular user, check their status
+    if (session.userId !== 'admin_user') {
+        const user = await User.findById(session.userId).select("status").lean();
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
+        if (!user) {
+        return NextResponse.json(
+            { success: false, error: "User not found" },
+            { status: 404 }
+        );
+        }
+
+        if (user.status !== "active") {
+        return NextResponse.json(
+            {
+            success: false,
+            error:
+                "Your account has been restricted. You cannot add new questions at this time.",
+            },
+            { status: 403 }
+        );
+        }
     }
 
-    if (user.status !== "active") {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Your account has been restricted. You cannot add new questions at this time.",
-        },
-        { status: 403 }
-      );
-    }
+
+    const userIdForDb = session.userId === 'admin_user' ? null : session.userId;
 
     // Create the question
     const newQuestion = await Question.create({
       question,
       answer,
       status,
-      userId: session.userId,
+      userId: userIdForDb,
     });
 
-    // Update user's questionsAdded count
-    await User.findByIdAndUpdate(session.userId, {
-      $inc: { questionsAdded: 1 },
-    });
+    // Update user's questionsAdded count for regular users
+    if (userIdForDb) {
+        await User.findByIdAndUpdate(userIdForDb, {
+            $inc: { questionsAdded: 1 },
+        });
+    }
+
 
     // Populate user info for response
     const populatedQuestion = await Question.findById(newQuestion._id)
@@ -106,7 +114,7 @@ export async function POST(request) {
       answer: populatedQuestion.answer,
       status: populatedQuestion.status,
       userId: populatedQuestion.userId?._id?.toString() || null,
-      username: populatedQuestion.userId?.username || "Unknown",
+      username: populatedQuestion.userId?.username || "Admin",
       userEmail: populatedQuestion.userId?.email || "",
       createdAt: populatedQuestion.createdAt,
       updatedAt: populatedQuestion.updatedAt,

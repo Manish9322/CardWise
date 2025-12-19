@@ -1,4 +1,5 @@
 
+
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import connectDB from "@/utils/db";
@@ -27,41 +28,47 @@ export async function POST(request) {
     }
 
     await connectDB();
+    
+    // If the user is a regular user, check their status.
+    if (session.userId !== 'admin_user') {
+      const user = await User.findById(session.userId).select("status").lean();
 
-    // Check if user is active
-    const user = await User.findById(session.userId).select("status").lean();
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
+      if (user.status !== "active") {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Your account has been restricted. You cannot add new questions at this time.",
+          },
+          { status: 403 }
+        );
+      }
     }
 
-    if (user.status !== "active") {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Your account has been restricted. You cannot add new questions at this time.",
-        },
-        { status: 403 }
-      );
-    }
 
-    // Add userId to each question
+    // Add userId to each question, handle admin case
+    const userIdForDb = session.userId === 'admin_user' ? null : session.userId;
     const questionsWithUser = questions.map(q => ({
       ...q,
-      userId: session.userId,
+      userId: userIdForDb,
     }));
 
     // Create the questions
     const createdQuestions = await Question.insertMany(questionsWithUser);
 
-    // Update user's questionsAdded count
-    await User.findByIdAndUpdate(session.userId, {
-      $inc: { questionsAdded: createdQuestions.length },
-    });
+    // Update user's questionsAdded count only for regular users
+    if (userIdForDb) {
+      await User.findByIdAndUpdate(userIdForDb, {
+        $inc: { questionsAdded: createdQuestions.length },
+      });
+    }
 
     return NextResponse.json({
       success: true,
