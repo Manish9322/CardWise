@@ -22,6 +22,7 @@ import {
   SidebarFooter,
   SidebarInset,
   useSidebar,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -102,12 +103,21 @@ function ProfileSidebar() {
     );
 }
 
+function MobileHeader() {
+    return (
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
+            <SidebarTrigger className="h-8 w-8 text-muted-foreground" />
+            <Link href="/profile" className="text-xl font-bold text-primary">CardWise</Link>
+        </header>
+    );
+}
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
         <ProfileSidebar />
         <SidebarInset>
+            <MobileHeader />
             <main className="p-4 sm:p-6 lg:p-8">{children}</main>
         </SidebarInset>
     </SidebarProvider>
