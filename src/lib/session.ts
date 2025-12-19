@@ -32,6 +32,7 @@ export async function createSession(userId: string) {
   (await cookies()).set('session', session, { expires, httpOnly: true });
 }
 
+
 export async function getSession() {
   const sessionCookie = (await cookies()).get('session')?.value || null;
   if (!sessionCookie) return null;
