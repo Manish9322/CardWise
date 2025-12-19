@@ -243,10 +243,6 @@ export default function Home() {
             <span className="sr-only">Go to Profile</span>
           </Link>
         </Button>
-        <Button onClick={handleTestDB} size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">
-            <Database className="h-6 w-6" />
-            <span className="sr-only">Test DB Connection</span>
-        </Button>
         <ThemeToggle />
       </div>
       <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
