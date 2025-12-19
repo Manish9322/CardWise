@@ -57,6 +57,10 @@ function ProfileSidebar() {
     const { state } = useSidebar();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
+    const handleLogout = async () => {
+        await logout();
+    };
+
     return (
         <>
             <Sidebar collapsible="icon">
@@ -97,7 +101,7 @@ function ProfileSidebar() {
           <LogoutConfirmationModal
             isOpen={isLogoutModalOpen}
             onOpenChange={setIsLogoutModalOpen}
-            onConfirm={logout}
+            onConfirm={handleLogout}
           />
         </>
     );

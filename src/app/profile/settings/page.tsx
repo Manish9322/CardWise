@@ -348,6 +348,10 @@ function DangerZoneTab({ userId }: { userId: string }) {
       setShowDeleteModal(false);
     }
   };
+  
+  const handleLogout = () => {
+    logout();
+  }
 
   return (
     <>
@@ -366,7 +370,7 @@ function DangerZoneTab({ userId }: { userId: string }) {
                 End your current session on this device.
               </p>
             </div>
-            <Button variant="outline" onClick={() => logout()}>
+            <Button variant="outline" onClick={handleLogout}>
               Log Out
             </Button>
           </div>

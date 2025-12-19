@@ -61,7 +61,7 @@ function AdminSidebar() {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     const handleLogout = async () => {
-        await logout();
+        await logout('/admin/login');
         dispatch(setAuthenticated(false));
     };
 
