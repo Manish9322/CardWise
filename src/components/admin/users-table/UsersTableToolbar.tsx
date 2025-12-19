@@ -39,85 +39,88 @@ export function UsersTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex w-full flex-col md:flex-row md:items-center gap-2">
         <Input
-          placeholder="Search users by name..."
+          placeholder="Search by name..."
           value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('username')?.setFilterValue(event.target.value)
           }
-          className="h-9 w-[150px] lg:w-[250px]"
+          className="h-9 w-full md:w-[150px] lg:w-[250px]"
         />
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9">
-              <SlidersHorizontal className="mr-2 h-4 w-4" />
-              Filters
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">Advanced Filters</h4>
-                <p className="text-sm text-muted-foreground">
-                  Filter users by status or email.
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
-                    onValueChange={(value) => {
-                        if (value === 'all') {
-                            table.getColumn('status')?.setFilterValue(undefined);
-                        } else {
-                            table.getColumn('status')?.setFilterValue(value);
+        <div className="flex flex-wrap items-center gap-2">
+            <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+                <span className="sm:hidden">Filter</span>
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="start">
+                <div className="grid gap-4">
+                <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Advanced Filters</h4>
+                    <p className="text-sm text-muted-foreground">
+                    Filter users by status or email.
+                    </p>
+                </div>
+                <div className="grid gap-2">
+                    <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                        value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
+                        onValueChange={(value) => {
+                            if (value === 'all') {
+                                table.getColumn('status')?.setFilterValue(undefined);
+                            } else {
+                                table.getColumn('status')?.setFilterValue(value);
+                            }
+                        }}
+                    >
+                        <SelectTrigger className="col-span-2 h-8">
+                        <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    </div>
+                    <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
+                        placeholder="user@example.com"
+                        value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+                        onChange={(event) =>
+                        table.getColumn('email')?.setFilterValue(event.target.value)
                         }
-                    }}
-                  >
-                    <SelectTrigger className="col-span-2 h-8">
-                      <SelectValue placeholder="All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
+                        className="col-span-2 h-8"
+                    />
+                    </div>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="user@example.com"
-                    value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) =>
-                      table.getColumn('email')?.setFilterValue(event.target.value)
-                    }
-                    className="col-span-2 h-8"
-                  />
                 </div>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-         {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-9 px-2 lg:px-3"
-          >
-            Clear Filters
-            <X className="ml-2 h-4 w-4" />
-          </Button>
-        )}
+            </PopoverContent>
+            </Popover>
+            {isFiltered && (
+            <Button
+                variant="ghost"
+                onClick={() => table.resetColumnFilters()}
+                className="h-9 px-2 lg:px-3"
+            >
+                Clear
+                <X className="ml-2 h-4 w-4" />
+            </Button>
+            )}
+        </div>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex w-full md:w-auto items-center space-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="ml-auto h-9">
+            <Button variant="outline" size="sm" className="ml-auto h-9 flex-1 md:flex-none">
               View
             </Button>
           </DropdownMenuTrigger>
@@ -144,9 +147,10 @@ export function UsersTableToolbar<TData>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button size="sm" className="h-9" onClick={() => handleOpenForm()}>
+        <Button size="sm" className="h-9 flex-1 md:flex-none" onClick={() => handleOpenForm()}>
           <UserPlus className="mr-2 h-4 w-4" />
-          Add User
+          <span className="hidden sm:inline">Add User</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
     </div>

@@ -133,31 +133,45 @@ export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: Get
     {
       accessorKey: 'email',
       header: 'Email',
+      enableHiding: true,
     },
     {
         accessorKey: 'phone',
         header: 'Phone Number',
+        enableHiding: true,
     },
     {
         accessorKey: 'questionsAdded',
-        header: 'Questions Added',
+        header: ({ column }) => {
+            return (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+              >
+                Questions
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            );
+        },
         cell: ({ row }) => {
           const router = useRouter();
           const user = row.original;
           const questionsCount = row.getValue('questionsAdded') as number;
           
           if (!questionsCount || questionsCount === 0) {
-            return <span className="text-muted-foreground">0</span>;
+            return <div className="text-center w-full">0</div>;
           }
           
           return (
-            <Button
-              variant="link"
-              className="p-0 h-auto font-normal text-primary hover:underline"
-              onClick={() => router.push(`/admin/manage-questions?userId=${user.id}&username=${encodeURIComponent(user.username)}`)}
-            >
-              {questionsCount}
-            </Button>
+            <div className="text-center w-full">
+                <Button
+                variant="link"
+                className="p-0 h-auto font-normal text-primary hover:underline"
+                onClick={() => router.push(`/admin/manage-questions?userId=${user.id}&username=${encodeURIComponent(user.username)}`)}
+                >
+                {questionsCount}
+                </Button>
+            </div>
           );
         },
     },
