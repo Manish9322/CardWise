@@ -1,7 +1,6 @@
+"use client";
 
-'use client';
-
-import * as React from 'react';
+import * as React from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -12,7 +11,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -21,17 +20,25 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { UsersTableToolbar } from './UsersTableToolbar';
-import { UsersTablePagination } from './UsersTablePagination';
-import { getColumns } from './columns';
-import type { User } from '@/lib/definitions';
-import { UserFormModal } from './UserFormModal';
-import { ViewUserModal } from './ViewUserModal';
-import { useDeleteUserMutation } from '@/utils/services/api';
-import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-
+} from "@/components/ui/table";
+import { UsersTableToolbar } from "./UsersTableToolbar";
+import { UsersTablePagination } from "./UsersTablePagination";
+import { getColumns } from "./columns";
+import type { User } from "@/lib/definitions";
+import { UserFormModal } from "./UserFormModal";
+import { ViewUserModal } from "./ViewUserModal";
+import { useDeleteUserMutation } from "@/utils/services/api";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UsersTableProps {
   data: User[];
@@ -40,14 +47,16 @@ interface UsersTableProps {
 export function UsersTable({ data }: UsersTableProps) {
   const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
-    email: false,
-    phone: false,
-  });
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  
-  const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
+
+  const [activeModal, setActiveModal] = React.useState<"form" | "view" | null>(
+    null
+  );
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
 
   const [userToDelete, setUserToDelete] = React.useState<string | null>(null);
@@ -55,18 +64,18 @@ export function UsersTable({ data }: UsersTableProps) {
 
   const handleOpenForm = (user: User | null = null) => {
     setSelectedUser(user);
-    setActiveModal('form');
+    setActiveModal("form");
   };
-  
+
   const handleOpenView = (user: User) => {
     setSelectedUser(user);
-    setActiveModal('view');
+    setActiveModal("view");
   };
 
   const handleCloseModals = () => {
     setActiveModal(null);
     setSelectedUser(null);
-  }
+  };
 
   const handleDelete = (userId: string) => {
     setUserToDelete(userId);
@@ -92,7 +101,10 @@ export function UsersTable({ data }: UsersTableProps) {
     }
   };
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView, handleDelete }), [handleOpenForm, handleOpenView, handleDelete]);
+  const columns = React.useMemo(
+    () => getColumns({ handleOpenForm, handleOpenView, handleDelete }),
+    [handleOpenForm, handleOpenView, handleDelete]
+  );
 
   const table = useReactTable({
     data,
@@ -115,7 +127,7 @@ export function UsersTable({ data }: UsersTableProps) {
 
   return (
     <div className="space-y-4">
-      <UsersTableToolbar table={table} handleOpenForm={handleOpenForm}/>
+      <UsersTableToolbar table={table} handleOpenForm={handleOpenForm} />
       <div className="rounded-md border overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
@@ -142,7 +154,7 @@ export function UsersTable({ data }: UsersTableProps) {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
+                    data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="whitespace-nowrap">
@@ -170,18 +182,21 @@ export function UsersTable({ data }: UsersTableProps) {
       </div>
       <UsersTablePagination table={table} />
       <UserFormModal
-        isOpen={activeModal === 'form'}
+        isOpen={activeModal === "form"}
         onOpenChange={handleCloseModals}
         user={selectedUser}
       />
       {selectedUser && (
-         <ViewUserModal
-            isOpen={activeModal === 'view'}
-            onOpenChange={handleCloseModals}
-            user={selectedUser}
+        <ViewUserModal
+          isOpen={activeModal === "view"}
+          onOpenChange={handleCloseModals}
+          user={selectedUser}
         />
       )}
-       <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+      <AlertDialog
+        open={!!userToDelete}
+        onOpenChange={(open) => !open && setUserToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -197,7 +212,7 @@ export function UsersTable({ data }: UsersTableProps) {
               disabled={isDeleting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isDeleting ? 'Deleting...' : 'Yes, delete user'}
+              {isDeleting ? "Deleting..." : "Yes, delete user"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
