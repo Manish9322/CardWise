@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -26,14 +25,14 @@ export function QuestionsTablePagination<TData>({
   table,
 }: QuestionsTablePaginationProps<TData>) {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
-      <div className="flex-1 text-sm text-muted-foreground self-start sm:self-center">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-2">
+      <div className="flex-1 text-sm text-muted-foreground self-start md:self-center">
         {table.getFilteredSelectedRowModel().rows.length} of{' '}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8 w-full sm:w-auto">
-        <div className="flex items-center space-x-2 w-full sm:w-auto">
-          <p className="text-sm font-medium">Rows per page</p>
+      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 lg:gap-8 w-full md:w-auto">
+        <div className="flex items-center space-x-2 w-full md:w-auto">
+          <p className="text-sm font-medium whitespace-nowrap">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -53,10 +52,12 @@ export function QuestionsTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center justify-between sm:justify-center gap-2 w-full sm:w-auto">
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()}
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-0 md:space-x-6 w-full md:w-auto">
+            <div className="flex w-full md:w-auto items-center justify-between md:justify-center gap-2">
+                <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                    Page {table.getState().pagination.pageIndex + 1} of{' '}
+                    {table.getPageCount()}
+                </div>
             </div>
             <div className="flex items-center space-x-2">
                 <Button

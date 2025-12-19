@@ -79,18 +79,20 @@ export default function ManageQuestionsPage() {
   const totalUsers = 1;
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-            <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
-            <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
-        </div>
-         <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
-            {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-            Refresh
-        </Button>
+    <div className="flex flex-1 flex-col gap-4">
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Manage Questions</h1>
+                <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all the questions in the game.</p>
+            </div>
+             <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
+                {isFetching ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                Refresh
+            </Button>
+          </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Questions</CardTitle>

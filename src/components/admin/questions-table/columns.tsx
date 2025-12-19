@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -135,27 +134,67 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
     },
     {
       accessorKey: 'question',
-      header: 'Question',
-      cell: ({ row }) => <div className="truncate max-w-[200px] sm:max-w-xs">{row.getValue('question')}</div>,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Question
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="truncate max-w-[150px] md:max-w-xs">{row.getValue('question')}</div>,
     },
     {
       accessorKey: 'answer',
-      header: 'Answer',
-      cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue('answer')}</div>,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Answer
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="truncate max-w-[150px] md:max-w-xs">{row.getValue('answer')}</div>,
       enableHiding: true,
     },
      {
       accessorKey: 'username',
-      header: 'Added By',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Added By
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
       cell: ({ row }) => {
         const username = row.getValue('username') as string;
-        return <div className="truncate max-w-[100px]">{username || 'Unknown'}</div>;
+        return <div className="truncate max-w-[100px] md:max-w-[120px]">{username || 'Unknown'}</div>;
       },
        enableHiding: true,
     },
     {
         accessorKey: 'status',
-        header: 'Visibility',
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Visibility
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
         cell: ({ row }) => <StatusToggle row={row} />,
         filterFn: (row, id, value) => {
             if (value === 'all') return true;
