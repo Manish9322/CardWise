@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -28,12 +27,17 @@ import { getColumns } from './columns';
 import type { User } from '@/lib/definitions';
 import { UserFormModal } from './UserFormModal';
 import { ViewUserModal } from './ViewUserModal';
+import { useDeleteUserMutation } from '@/utils/services/api';
+import { useToast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+
 
 interface UsersTableProps {
   data: User[];
 }
 
 export function UsersTable({ data }: UsersTableProps) {
+  const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -41,6 +45,9 @@ export function UsersTable({ data }: UsersTableProps) {
   
   const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
+
+  const [userToDelete, setUserToDelete] = React.useState<string | null>(null);
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
   const handleOpenForm = (user: User | null = null) => {
     setSelectedUser(user);
@@ -57,7 +64,31 @@ export function UsersTable({ data }: UsersTableProps) {
     setSelectedUser(null);
   }
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), [handleOpenForm, handleOpenView]);
+  const handleDelete = (userId: string) => {
+    setUserToDelete(userId);
+  };
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await deleteUser(userToDelete).unwrap();
+      toast({
+        title: "Success",
+        description: "User deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete user.",
+      });
+    } finally {
+      setUserToDelete(null);
+    }
+  };
+
+  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView, handleDelete }), [handleOpenForm, handleOpenView, handleDelete]);
 
   const table = useReactTable({
     data,
@@ -80,7 +111,7 @@ export function UsersTable({ data }: UsersTableProps) {
 
   return (
     <div className="space-y-4">
-      <UsersTableToolbar table={table} />
+      <UsersTableToolbar table={table} handleOpenForm={handleOpenForm}/>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -144,6 +175,27 @@ export function UsersTable({ data }: UsersTableProps) {
             user={selectedUser}
         />
       )}
+       <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              user and all their associated questions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Yes, delete user'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

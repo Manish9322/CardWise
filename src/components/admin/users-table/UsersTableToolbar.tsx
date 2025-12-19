@@ -2,7 +2,7 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -29,10 +29,12 @@ import {
 
 interface UsersTableToolbarProps<TData> {
   table: Table<TData>;
+  handleOpenForm: () => void;
 }
 
 export function UsersTableToolbar<TData>({
   table,
+  handleOpenForm,
 }: UsersTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -142,6 +144,10 @@ export function UsersTableToolbar<TData>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button size="sm" className="h-9" onClick={() => handleOpenForm()}>
+          <UserPlus className="mr-2 h-4 w-4" />
+          Add User
+        </Button>
       </div>
     </div>
   );

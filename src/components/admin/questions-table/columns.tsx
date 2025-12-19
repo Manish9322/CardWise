@@ -15,15 +15,16 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import type { Card } from '@/lib/definitions';
-import { useUpdateQuestionMutation, useDeleteQuestionMutation } from '@/utils/services/api';
+import { useUpdateQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 type GetColumnsProps = {
   handleOpenForm: (question: Card) => void;
   handleOpenView: (question: Card) => void;
+  handleDelete: (questionId: string) => void;
 }
 
-export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps): ColumnDef<Card>[] => {
+export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: GetColumnsProps): ColumnDef<Card>[] => {
   
   const StatusToggle = ({ row }: { row: any }) => {
     const { toast } = useToast();
@@ -61,26 +62,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
 
   const ActionsCell = ({ row }: { row: any }) => {
     const card = row.original as Card;
-    const { toast } = useToast();
-    const [deleteQuestion] = useDeleteQuestionMutation();
-
-    const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this question?')) return;
-        try {
-            await deleteQuestion(card.id).unwrap();
-            toast({
-                title: "Success",
-                description: "Question deleted successfully.",
-            });
-        } catch (error) {
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Failed to delete question.",
-            });
-        }
-    };
-
+    
     return (
         <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -100,7 +82,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
             <DropdownMenuSeparator />
             <DropdownMenuItem
             className="text-destructive focus:text-destructive"
-            onClick={handleDelete}
+            onClick={() => handleDelete(card.id)}
             >
             Delete
             </DropdownMenuItem>

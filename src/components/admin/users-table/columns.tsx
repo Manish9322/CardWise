@@ -15,16 +15,17 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import type { User } from '@/lib/definitions';
-import { useUpdateUserMutation, useDeleteUserMutation } from '@/utils/services/api';
+import { useUpdateUserMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 type GetColumnsProps = {
   handleOpenForm: (user: User) => void;
   handleOpenView: (user: User) => void;
+  handleDelete: (userId: string) => void;
 }
 
-export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps): ColumnDef<User>[] => {
+export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: GetColumnsProps): ColumnDef<User>[] => {
   
   const StatusToggle = ({ row }: { row: any }) => {
     const { toast } = useToast();
@@ -63,26 +64,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
 
   const ActionsCell = ({ row }: { row: any }) => {
     const user = row.original as User;
-    const { toast } = useToast();
-    const [deleteUser] = useDeleteUserMutation();
-
-    const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
-        try {
-            await deleteUser(user.id).unwrap();
-            toast({
-                title: "Success",
-                description: "User deleted successfully.",
-            });
-        } catch (error) {
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Failed to delete user.",
-            });
-        }
-    };
-
+    
     return (
         <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -102,7 +84,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView }: GetColumnsProps):
             <DropdownMenuSeparator />
             <DropdownMenuItem
             className="text-destructive focus:text-destructive"
-            onClick={handleDelete}
+            onClick={() => handleDelete(user.id)}
             >
             Delete
             </DropdownMenuItem>

@@ -28,6 +28,9 @@ import { getColumns } from './columns';
 import type { Card } from '@/lib/definitions';
 import { QuestionFormModal } from './QuestionFormModal';
 import { ViewQuestionModal } from './ViewQuestionModal';
+import { useDeleteQuestionMutation } from '@/utils/services/api';
+import { useToast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface QuestionsTableProps {
   data: Card[];
@@ -36,6 +39,7 @@ interface QuestionsTableProps {
 }
 
 export function QuestionsTable({ data, initialFilters = [], filterUsername }: QuestionsTableProps) {
+  const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(initialFilters);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -43,6 +47,9 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
   
   const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
   const [selectedQuestion, setSelectedQuestion] = React.useState<Card | null>(null);
+
+  const [questionToDelete, setQuestionToDelete] = React.useState<string | null>(null);
+  const [deleteQuestion, { isLoading: isDeleting }] = useDeleteQuestionMutation();
 
   const handleOpenForm = (question: Card | null = null) => {
     setSelectedQuestion(question);
@@ -57,9 +64,34 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
   const handleCloseModals = () => {
     setActiveModal(null);
     setSelectedQuestion(null);
-  }
+  };
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView }), []);
+  const handleDelete = (questionId: string) => {
+    setQuestionToDelete(questionId);
+  };
+
+  const confirmDelete = async () => {
+    if (!questionToDelete) return;
+
+    try {
+      await deleteQuestion(questionToDelete).unwrap();
+      toast({
+        title: "Success",
+        description: "Question deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete question.",
+      });
+    } finally {
+      setQuestionToDelete(null);
+    }
+  };
+
+
+  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView, handleDelete }), []);
 
   const table = useReactTable({
     data,
@@ -148,6 +180,27 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
             question={selectedQuestion}
         />
       )}
+       <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              question from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Yes, delete question'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
