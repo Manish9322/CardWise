@@ -107,22 +107,22 @@ function DangerZoneTab() {
 
   return (
     <>
-      <Card className="border-red-500 dark:border-red-400">
+      <Card className="border-purple-500 dark:border-purple-400">
         <CardHeader>
-          <CardTitle className="text-red-600 dark:text-red-500">Danger Zone</CardTitle>
+          <CardTitle className="text-purple-600 dark:text-purple-500">Danger Zone</CardTitle>
           <CardDescription>
             These actions can have significant consequences. Please proceed with caution.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border border-red-500/50 bg-red-500/5 p-4">
+          <div className="flex items-center justify-between rounded-lg border border-purple-500/50 bg-purple-500/5 p-4">
             <div>
-              <h4 className="font-medium text-red-600 dark:text-red-500">Reset All Data</h4>
+              <h4 className="font-medium text-purple-600 dark:text-purple-500">Reset All Data</h4>
               <p className="text-sm text-muted-foreground">
                 Permanently delete all questions and user-contributed data.
               </p>
             </div>
-            <Button variant="destructive" onClick={() => handleAction('Reset Data')}>
+            <Button variant="default" onClick={() => handleAction('Reset Data')} className="bg-primary hover:bg-purple-500/90">
               Reset Data
             </Button>
           </div>
