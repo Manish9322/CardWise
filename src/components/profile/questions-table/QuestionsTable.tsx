@@ -43,8 +43,6 @@ export function QuestionsTable({ data }: QuestionsTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
-    answer: false,
-    username: true,
   });
   const [rowSelection, setRowSelection] = React.useState({});
   
