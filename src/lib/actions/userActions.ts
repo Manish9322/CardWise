@@ -1,109 +1,181 @@
-'use server';
+'use client';
 
-import { revalidatePath } from 'next/cache';
-import type { User } from '@/lib/definitions';
+import Link from 'next/link';
+import {
+  Activity,
+  ArrowUpRight,
+  BookCopy,
+  Users,
+  HelpCircle,
+  UserPlus,
+  Terminal,
+  RefreshCw,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { OverviewChart } from '@/components/admin/dashboard/OverviewChart';
+import { RecentUsers } from '@/components/admin/dashboard/RecentUsers';
+import { RecentQuestions } from '@/components/admin/dashboard/RecentQuestions';
+import { LineChartComponent } from '@/components/admin/dashboard/LineChartComponent';
+import { useGetQuestionsQuery, useGetUsersQuery } from '@/utils/services/api';
+import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
 
-export async function getAllUsers(): Promise<User[]> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/users`, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+export default function Dashboard() {
+  const { data: cardData, isLoading: isLoadingCards, error: cardsError, refetch: refetchCards } = useGetQuestionsQuery(undefined);
+  const { data: userData, isLoading: isLoadingUsers, error: usersError, refetch: refetchUsers } = useGetUsersQuery(undefined);
 
-    if (!response.ok) {
-      console.error('Failed to fetch users:', response.statusText);
-      return [];
-    }
-
-    const users = await response.json();
-    return users;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    return [];
+  const refetchAll = () => {
+    refetchCards();
+    refetchUsers();
   }
-}
 
-export async function createUserAction(formData: FormData) {
-  const data = {
-    username: formData.get('username') as string,
-    email: formData.get('email') as string,
-    phone: formData.get('phone') as string,
-    status: (formData.get('status') as 'active' | 'inactive') || 'inactive',
-  };
-  
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create user');
-    }
-
-    revalidatePath('/admin/manage-users');
-  } catch (error) {
-    console.error('Error creating user:', error);
-    throw error;
+  if (isLoadingCards || isLoadingUsers) {
+    return <ManageQuestionsSkeleton />;
   }
-}
 
-export async function updateUserAction(id: string, formData: FormData) {
-  const data = {
-    username: formData.get('username') as string,
-    email: formData.get('email') as string,
-    phone: formData.get('phone') as string,
-    status: formData.get('status') as 'active' | 'inactive',
-  };
-  
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/users/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update user');
-    }
-
-    revalidatePath('/admin/manage-users');
-  } catch (error) {
-    console.error('Error updating user:', error);
-    throw error;
+  if (cardsError || usersError) {
+    return (
+      <div className="flex h-[80vh] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+          <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h2 className="mt-4 text-lg font-semibold text-destructive">Error Fetching Dashboard Data</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            There was a problem loading the dashboard statistics. Please try again.
+          </p>
+          <Button onClick={refetchAll} variant="outline" size="sm" className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
   }
-}
 
-export async function deleteUserAction(id: string) {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/users/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  const cardList = cardData || [];
+  const userList = userData || [];
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to delete user');
-    }
+  const totalQuestions = cardList.length;
+  const activeQuestions = cardList.filter((c: any) => c.status === 'active').length;
+  const totalUsers = userList.length;
+  const questionsAdded = userList.reduce((acc: any, user: any) => acc + (user.questionsAdded || 0), 0);
 
-    revalidatePath('/admin/manage-users');
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    throw error;
-  }
+  return (
+    <div className="flex min-h-screen w-full flex-col">
+      <main className="flex flex-1 flex-col gap-4">
+        <div className="mb-6 flex items-center justify-between">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-muted-foreground mt-1">A quick overview of your application's stats.</p>
+            </div>
+            <Button onClick={refetchAll} variant="outline" size="sm">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+            </Button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
+              <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalQuestions}</div>
+              <p className="text-xs text-muted-foreground">Total questions in the database</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Questions</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{activeQuestions}</div>
+              <p className="text-xs text-muted-foreground">Currently in play</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalUsers}</div>
+              <p className="text-xs text-muted-foreground">Total registered users</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Questions Added by Users</CardTitle>
+              <BookCopy className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{questionsAdded}</div>
+              <p className="text-xs text-muted-foreground">From all users</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-users">
+                    <UserPlus className="h-6 w-6" />
+                    <span className="text-sm font-medium">Add User</span>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-questions">
+                    <HelpCircle className="h-6 w-6" />
+                    <span className="text-sm font-medium">Manage Questions</span>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
+                <Link href="/admin/manage-users">
+                    <Users className="h-6 w-6" />
+                    <span className="text-sm font-medium">Manage Users</span>
+                </Link>
+            </Button>
+        </div>
+
+        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Questions Activity</CardTitle>
+              <CardDescription>A line chart showing questions added over time.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LineChartComponent />
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader className="flex flex-row items-center">
+              <div className="grid gap-2">
+                <CardTitle>Users Overview</CardTitle>
+                <CardDescription>Recent new users in the last 7 days.</CardDescription>
+              </div>
+              <Button asChild size="sm" className="ml-auto gap-1">
+                <Link href="/admin/manage-users">
+                  View All
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <OverviewChart />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+            <RecentQuestions questions={cardList} />
+            <RecentUsers users={userList} />
+        </div>
+      </main>
+    </div>
+  );
 }
