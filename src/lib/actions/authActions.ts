@@ -14,8 +14,15 @@ export async function login(prevState: any, formData: FormData) {
     return { error: 'Email and password are required' };
   }
 
+  // Handle hardcoded admin credentials
+  if (email === 'admin@cardwise.com' && password === 'Password@cardwise') {
+    // For the admin, we can use a hardcoded user ID or a special value for the session
+    await createSession('admin_user');
+    redirect('/admin');
+  }
+
   try {
-    // Connect to database
+    // Connect to database for regular user login
     await connectDB();
     
     // Find user by email

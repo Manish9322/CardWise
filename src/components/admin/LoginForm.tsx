@@ -44,13 +44,13 @@ export default function LoginForm() {
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="admin@example.com" required defaultValue="admin@example.com" />
+            <Input id="email" name="email" type="email" placeholder="admin@cardwise.com" required defaultValue="admin@cardwise.com" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required defaultValue="password" />
+            <Input id="password" name="password" type="password" required defaultValue="Password@cardwise" />
           </div>
-          <p className="text-xs text-muted-foreground">Hint: Use `admin@example.com` and `password`.</p>
+          <p className="text-xs text-muted-foreground">Hint: Use `admin@cardwise.com` and `Password@cardwise`.</p>
           <SubmitButton />
         </form>
       </CardContent>
