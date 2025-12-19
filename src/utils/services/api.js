@@ -1,3 +1,4 @@
+
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Custom base query that includes authentication token
@@ -87,6 +88,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Questions", "CurrentUser"],
     }),
+    addBulkQuestions: builder.mutation({
+      query: (questions) => ({
+        url: "/questions/bulk",
+        method: "POST",
+        body: questions,
+      }),
+      invalidatesTags: ["Questions", "CurrentUser"],
+    }),
     updateQuestion: builder.mutation({
       query: ({ id, ...question }) => ({
         url: `/questions/${id}`,
@@ -121,14 +130,14 @@ export const api = createApi({
         method: "PUT",
         body: user,
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: ["Users", "CurrentUser"],
     }),
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: ["Users", "Questions"],
     }),
   }),
 });
@@ -140,6 +149,7 @@ export const {
   useGetQuestionsQuery,
   useGetUserQuestionsQuery,
   useAddQuestionMutation,
+  useAddBulkQuestionsMutation,
   useUpdateQuestionMutation,
   useDeleteQuestionMutation,
   useGetUsersQuery,

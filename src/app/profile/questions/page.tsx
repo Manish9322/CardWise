@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -6,17 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BookCopy, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { BookCopy, CheckCircle, XCircle, RefreshCw, Terminal, PlusCircle } from 'lucide-react';
 import { useGetUserQuestionsQuery } from '@/utils/services/api';
-import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
+import { QuestionsTable } from '@/components/profile/questions-table/QuestionsTable';
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 export default function MyQuestionsPage() {
-  const router = useRouter();
   const { data: cards, error, isLoading, isFetching, refetch } = useGetUserQuestionsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -27,19 +24,54 @@ export default function MyQuestionsPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">My Questions</h1>
-          <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all of your questions.</p>
+      <div className="flex h-[80vh] flex-col items-center justify-center rounded-lg border border-dashed">
+        <div className="text-center">
+            <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h2 className="mt-4 text-lg font-semibold text-destructive">Error Fetching Data</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+                There was a problem loading your questions. Please try again.
+            </p>
+            <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retry
+            </Button>
         </div>
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load your questions. Please try again later.
-          </AlertDescription>
-        </Alert>
       </div>
     );
   }
+  
+  if (!cards || cards.length === 0) {
+    return (
+       <div className="space-y-6">
+        <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">My Questions</h1>
+                <p className="text-muted-foreground mt-1">Here you can add, edit, and manage all your questions.</p>
+              </div>
+            </div>
+        </div>
+        <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-16">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <BookCopy className="h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-2xl font-semibold tracking-tight">
+              No Questions Found
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Get started by adding your first question.
+            </p>
+            <div className="mt-6">
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add New Question
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   const totalQuestions = cards?.length || 0;
   const activeQuestions = cards?.filter((c: any) => c.status === 'active').length || 0;

@@ -32,14 +32,12 @@ interface QuestionsTableToolbarProps<TData> {
   table: Table<TData>;
   handleOpenForm: () => void;
   handleOpenBulkForm: () => void;
-  filterUsername?: string;
 }
 
 export function QuestionsTableToolbar<TData>({
   table,
   handleOpenForm,
   handleOpenBulkForm,
-  filterUsername,
 }: QuestionsTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -55,23 +53,6 @@ export function QuestionsTableToolbar<TData>({
           className="h-9 w-full md:w-[150px] lg:w-[250px]"
         />
         <div className="flex flex-wrap items-center gap-2">
-            {filterUsername && (
-            <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 h-9">
-                <span className="text-sm text-muted-foreground">User:</span>
-                <span className="text-sm font-medium">{filterUsername}</span>
-                <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 hover:bg-transparent"
-                onClick={() => {
-                    table.getColumn('username')?.setFilterValue(undefined);
-                    window.history.replaceState({}, '', '/admin/manage-questions');
-                }}
-                >
-                <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                </Button>
-            </div>
-            )}
             <Popover>
             <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9">
@@ -85,7 +66,7 @@ export function QuestionsTableToolbar<TData>({
                 <div className="space-y-2">
                     <h4 className="font-medium leading-none">Advanced Filters</h4>
                     <p className="text-sm text-muted-foreground">
-                    Filter questions by visibility or user.
+                    Filter questions by visibility.
                     </p>
                 </div>
                 <div className="grid gap-2">
@@ -111,23 +92,11 @@ export function QuestionsTableToolbar<TData>({
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="username">Added By</Label>
-                        <Input
-                            id="username"
-                            placeholder="Username"
-                            value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
-                            onChange={(event) =>
-                                table.getColumn('username')?.setFilterValue(event.target.value)
-                            }
-                            className="col-span-2 h-8"
-                        />
-                    </div>
                 </div>
                 </div>
             </PopoverContent>
             </Popover>
-            {isFiltered && !filterUsername && (
+            {isFiltered && (
             <Button
                 variant="ghost"
                 onClick={() => table.resetColumnFilters()}

@@ -24,11 +24,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { QuestionsTableToolbar } from './QuestionsTableToolbar';
-import { QuestionsTablePagination } from './QuestionsTablePagination';
+import { QuestionsTablePagination } from '@/components/admin/questions-table/QuestionsTablePagination';
 import { getColumns } from './columns';
 import type { Card } from '@/lib/definitions';
-import { QuestionFormModal } from './QuestionFormModal';
-import { ViewQuestionModal } from './ViewQuestionModal';
+import { QuestionFormModal } from '@/components/admin/questions-table/QuestionFormModal';
+import { ViewQuestionModal } from '@/components/admin/questions-table/ViewQuestionModal';
 import { BulkQuestionFormModal } from '@/components/common/BulkQuestionFormModal';
 import { useDeleteQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -36,17 +36,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 interface QuestionsTableProps {
   data: Card[];
-  initialFilters?: ColumnFiltersState;
-  filterUsername?: string;
 }
 
-export function QuestionsTable({ data, initialFilters = [], filterUsername }: QuestionsTableProps) {
+export function QuestionsTable({ data }: QuestionsTableProps) {
   const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(initialFilters);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     answer: false,
-    username: false,
+    username: true,
   });
   const [rowSelection, setRowSelection] = React.useState({});
   
@@ -65,7 +63,7 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
     setSelectedQuestion(question);
     setActiveModal('view');
   };
-  
+
   const handleOpenBulkForm = () => {
     setActiveModal('bulk');
   };
@@ -127,7 +125,6 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
         table={table} 
         handleOpenForm={handleOpenForm} 
         handleOpenBulkForm={handleOpenBulkForm}
-        filterUsername={filterUsername} 
       />
       <div className="rounded-md border overflow-hidden">
         <div className="overflow-x-auto">
