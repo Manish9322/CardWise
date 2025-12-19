@@ -28,6 +28,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useState } from 'react';
 import { LogoutConfirmationModal } from '@/components/common/LogoutConfirmationModal';
 import { logout } from '@/lib/actions/authActions';
+import ThemeToggle from '@/components/common/ThemeToggle';
 
 function SidebarToggle() {
     const { state, toggleSidebar } = useSidebar();
@@ -86,9 +87,10 @@ function ProfileSidebar() {
                     <SidebarMenuButton onClick={() => setIsLogoutModalOpen(true)} tooltip="Logout">
                         <LogOut /><span>Logout</span>
                     </SidebarMenuButton>
-                <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center' : 'justify-end')}>
-                    <SidebarToggle />
-                </div>
+                    <div className={cn("flex items-center", state === 'collapsed' ? 'justify-center flex-col gap-2' : 'justify-between')}>
+                        {state === 'expanded' && <ThemeToggle />}
+                        <SidebarToggle />
+                    </div>
                 </SidebarFooter>
           </Sidebar>
           <LogoutConfirmationModal
