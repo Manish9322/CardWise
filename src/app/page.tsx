@@ -237,7 +237,6 @@ export default function Home() {
         {renderContent()}
       </main>
       <div className="fixed top-4 left-4 z-10 flex flex-col gap-2">
-        <ThemeToggle />
         <Button asChild size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">
           <Link href="/profile">
             <User className="h-6 w-6" />
@@ -248,6 +247,7 @@ export default function Home() {
             <Database className="h-6 w-6" />
             <span className="sr-only">Test DB Connection</span>
         </Button>
+        <ThemeToggle />
       </div>
       <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
           <Button 

@@ -8,7 +8,7 @@ type GuessCardProps = {
 
 export default function GuessCard({ question, answer, isFlipped }: GuessCardProps) {
   return (
-    <div className="relative h-96 w-full max-w-full flex items-center justify-center">
+    <div className="relative h-96 w-full max-w-7xl flex items-center justify-center">
       <div
         className={cn(
           'flex items-center justify-center p-6 text-5xl md:text-7xl font-semibold text-center leading-tight transition-opacity duration-300 ease-in-out',
