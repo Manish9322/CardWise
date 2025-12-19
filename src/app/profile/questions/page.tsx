@@ -21,12 +21,6 @@ export default function MyQuestionsPage() {
     refetchOnMountOrArgChange: true,
   });
 
-  useEffect(() => {
-    if (error && 'status' in error && error.status === 401) {
-      router.push('/login');
-    }
-  }, [error, router]);
-
   if (isLoading) {
     return <ManageQuestionsSkeleton />;
   }

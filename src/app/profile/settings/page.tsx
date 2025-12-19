@@ -413,12 +413,6 @@ export default function SettingsPage() {
   const router = useRouter();
   const { data, isLoading, isError, error } = useGetCurrentUserQuery(undefined);
 
-  useEffect(() => {
-    if (isError && error && 'status' in error && error.status === 401) {
-      router.push('/login');
-    }
-  }, [isError, error, router]);
-
   if (isLoading) {
     return <ProfileOverviewSkeleton />;
   }

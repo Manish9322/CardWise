@@ -21,12 +21,6 @@ export default function ProfileOverviewPage() {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch } = useGetCurrentUserQuery(undefined);
 
-  useEffect(() => {
-    if (isError && error && 'status' in error && error.status === 401) {
-      router.push('/login');
-    }
-  }, [isError, error, router]);
-
   if (isLoading) {
     return <ProfileOverviewSkeleton />;
   }
