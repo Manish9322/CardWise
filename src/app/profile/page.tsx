@@ -36,7 +36,7 @@ export default function ProfileOverviewPage() {
       <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-lg border border-dashed">
         <div className="text-center">
           <Terminal className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h2 className="mt-4 text-lg font-semibold text-destructive">Error Loading Your Profile</h2>
+          <h2 className="mt-4 text-lg font-semibold text-primary">Error Loading Your Profile</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             There was a problem loading your user data. Please try again.
           </p>

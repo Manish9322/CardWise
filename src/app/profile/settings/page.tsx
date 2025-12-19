@@ -314,9 +314,9 @@ function DangerZoneTab({ userId }: { userId: string }) {
 
   return (
     <>
-      <Card className="border-red-500 dark:border-red-400">
+      <Card className="border-primary dark:border-purple-400">
         <CardHeader>
-          <CardTitle className="text-red-600 dark:text-red-500">Danger Zone</CardTitle>
+          <CardTitle className="text-primary dark:text-purple-500">Danger Zone</CardTitle>
           <CardDescription>
             These actions are irreversible. Please proceed with caution.
           </CardDescription>
@@ -333,14 +333,14 @@ function DangerZoneTab({ userId }: { userId: string }) {
               Log Out
             </Button>
           </div>
-          <div className="flex items-center justify-between rounded-lg border border-red-500/50 bg-red-500/5 p-4">
+          <div className="flex items-center justify-between rounded-lg border border-purple-500/50 bg-purple-500/5 p-4">
             <div>
-              <h4 className="font-medium text-red-600 dark:text-red-500">Delete Account</h4>
+              <h4 className="font-medium text-primary dark:text-purple-500">Delete Account</h4>
               <p className="text-sm text-muted-foreground">
                 Permanently delete your account and all associated data.
               </p>
             </div>
-            <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
+            <Button variant="default" onClick={() => setShowDeleteModal(true)} className="bg-primary hover:bg-primary/90">
               Delete Account
             </Button>
           </div>
