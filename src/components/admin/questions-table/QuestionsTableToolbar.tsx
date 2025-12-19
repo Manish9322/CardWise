@@ -124,7 +124,7 @@ export function QuestionsTableToolbar<TData>({
                 </div>
             </PopoverContent>
             </Popover>
-            {isFiltered && (
+            {isFiltered && !filterUsername && (
             <Button
                 variant="ghost"
                 onClick={() => table.resetColumnFilters()}

@@ -42,7 +42,10 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
   const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(initialFilters);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    answer: false,
+    username: false,
+  });
   const [rowSelection, setRowSelection] = React.useState({});
   
   const [activeModal, setActiveModal] = React.useState<'form' | 'view' | null>(null);
