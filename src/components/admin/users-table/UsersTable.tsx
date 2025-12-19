@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -170,13 +171,13 @@ export function UsersTable({ data }: UsersTableProps) {
       <UsersTablePagination table={table} />
       <UserFormModal
         isOpen={activeModal === 'form'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
+        onOpenChange={handleCloseModals}
         user={selectedUser}
       />
       {selectedUser && (
          <ViewUserModal
             isOpen={activeModal === 'view'}
-            onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
+            onOpenChange={handleCloseModals}
             user={selectedUser}
         />
       )}

@@ -184,17 +184,17 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
       <QuestionsTablePagination table={table} />
       <QuestionFormModal
         isOpen={activeModal === 'form'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
+        onOpenChange={handleCloseModals}
         question={selectedQuestion}
       />
       <BulkQuestionFormModal 
         isOpen={activeModal === 'bulk'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
+        onOpenChange={handleCloseModals}
       />
       {selectedQuestion && (
          <ViewQuestionModal
             isOpen={activeModal === 'view'}
-            onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
+            onOpenChange={handleCloseModals}
             question={selectedQuestion}
         />
       )}
