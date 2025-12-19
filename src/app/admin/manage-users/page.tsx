@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, UserCheck, UserX, HelpCircle, Terminal, RefreshCw } from 'lucide-react';
+import { Users, UserCheck, UserX, HelpCircle, Terminal, RefreshCw, UserPlus } from 'lucide-react';
 import { useGetUsersQuery } from '@/utils/services/api';
 import { UsersTable } from '@/components/admin/users-table/UsersTable';
 import { ManageUsersSkeleton } from '@/components/admin/skeletons/ManageUsersSkeleton';
@@ -46,16 +46,22 @@ export default function ManageUsersPage() {
             <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
             <p className="text-muted-foreground mt-1">View and manage all registered users in your application.</p>
         </div>
-        <div className="text-center py-16 rounded-lg border-2 border-dashed">
-            <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h2 className="mt-4 text-lg font-semibold">No Users Found</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-                Get started by adding a new user.
+        <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-16">
+          <div className="flex flex-col items-center gap-1 text-center">
+             <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-2xl font-semibold tracking-tight">
+              No Users Found
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              You can start by creating a new user.
             </p>
-             <div className="mt-4">
-                {/* In a future step, this button will open a modal */}
-                <Button>Add New User</Button>
+            <div className="mt-6">
+              <Button>
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add New User
+              </Button>
             </div>
+          </div>
         </div>
       </div>
     );

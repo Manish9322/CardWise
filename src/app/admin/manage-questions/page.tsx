@@ -7,9 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw, X } from 'lucide-react';
+import { Users, BookCopy, CheckCircle, XCircle, Terminal, RefreshCw, X, PlusCircle } from 'lucide-react';
 import { useGetQuestionsQuery } from '@/utils/services/api';
 import { QuestionsTable } from '@/components/admin/questions-table/QuestionsTable';
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
@@ -56,16 +55,23 @@ export default function ManageQuestionsPage() {
               </div>
             </div>
         </div>
-        <div className="text-center py-16 rounded-lg border-2 border-dashed">
-            <BookCopy className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h2 className="mt-4 text-lg font-semibold">No Questions Found</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-                Get started by adding a new question.
+        <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-16">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <BookCopy className="h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-2xl font-semibold tracking-tight">
+              No Questions Found
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Get started by adding a new question.
             </p>
-             <div className="mt-4">
-                {/* This button is handled inside the QuestionsTable component */}
-                <Button>Add New Question</Button>
+            <div className="mt-6">
+              {/* This button will be handled inside the QuestionsTable, but we can have a placeholder here */}
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add New Question
+              </Button>
             </div>
+          </div>
         </div>
       </div>
     );
@@ -92,7 +98,7 @@ export default function ManageQuestionsPage() {
             </Button>
           </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
