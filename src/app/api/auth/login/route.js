@@ -5,8 +5,6 @@ import { createSession } from "@/lib/session";
 
 export async function POST(request) {
   try {
-    await connectDB();
-    
     const body = await request.json();
     const { email, password } = body;
     
@@ -17,6 +15,18 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+    
+    // Handle hardcoded admin credentials
+    if (email === 'admin@cardwise.com' && password === 'Password@cardwise') {
+        await createSession('admin_user');
+        return NextResponse.json({
+            success: true,
+            message: "Admin login successful",
+            isAdmin: true,
+        });
+    }
+
+    await connectDB();
     
     // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });

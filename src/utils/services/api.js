@@ -57,6 +57,14 @@ export const api = createApi({
       query: () => "/test-db-connection",
       providesTags: ["DB"],
     }),
+    // Auth endpoint
+    adminLogin: builder.mutation({
+      query: (credentials) => ({
+        url: "/auth/login",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
     // Current User endpoint
     getCurrentUser: builder.query({
       query: () => "/user",
@@ -127,6 +135,7 @@ export const api = createApi({
 
 export const {
   useTestDBConnectionQuery,
+  useAdminLoginMutation,
   useGetCurrentUserQuery,
   useGetQuestionsQuery,
   useGetUserQuestionsQuery,

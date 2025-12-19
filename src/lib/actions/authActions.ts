@@ -9,17 +9,8 @@ export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  // Validate required fields
-  if (!email || !password) {
-    return { error: 'Email and password are required' };
-  }
-
-  // Handle hardcoded admin credentials
-  if (email === 'admin@cardwise.com' && password === 'Password@cardwise') {
-    // For the admin, we can use a hardcoded user ID or a special value for the session
-    await createSession('admin_user');
-    redirect('/admin');
-  }
+  // This server action is now only for non-admin users.
+  // Admin login is handled via a client-side call to /api/auth/login.
 
   try {
     // Connect to database for regular user login
