@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -28,6 +29,7 @@ import type { Card } from '@/lib/definitions';
 import { useAddQuestionMutation, useUpdateQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import { usePathname } from 'next/navigation';
 
 interface QuestionFormModalProps {
   isOpen: boolean;
@@ -45,9 +47,12 @@ type FormData = z.infer<typeof formSchema>;
 
 export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFormModalProps) {
   const { toast } = useToast();
+  const pathname = usePathname();
   const isEditing = !!question;
   const [addQuestion] = useAddQuestionMutation();
   const [updateQuestion] = useUpdateQuestionMutation();
+
+  const isAdminRoute = pathname.startsWith('/admin');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -77,20 +82,19 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
+        const payload = {
+          ...data,
+          status: isAdminRoute ? data.status : 'pending',
+        };
+
         if (isEditing && question) {
             await updateQuestion({
               id: question.id,
-              question: data.question,
-              answer: data.answer,
-              status: data.status,
+              ...payload
             }).unwrap();
             toast({ title: "Success", description: "Question updated successfully." });
         } else {
-            await addQuestion({
-              question: data.question,
-              answer: data.answer,
-              status: data.status,
-            }).unwrap();
+            await addQuestion(payload).unwrap();
             toast({ title: "Success", description: "Question submitted for approval." });
         }
         onOpenChange(false);
@@ -140,42 +144,44 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-4"
-                    >
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="active" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Active</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="inactive" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Inactive</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="pending" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Pending</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {isAdminRoute && (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex space-x-4"
+                      >
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="active" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Active</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="inactive" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Inactive</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="pending" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Pending</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <DialogFooter>
                 <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
