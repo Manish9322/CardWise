@@ -13,16 +13,15 @@ import { useGetCurrentUserQuery, useGetUserQuestionsQuery, useGetUsersQuery } fr
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
-import { LineChartComponent, type LineChartData } from '@/components/admin/dashboard/LineChartComponent';
 import { OverviewChart, type OverviewData } from '@/components/admin/dashboard/OverviewChart';
 import { Button } from '@/components/ui/button';
-import { format, getMonth } from 'date-fns';
+import { format, getMonth, isAfter, subDays } from 'date-fns';
 
 export default function ProfileOverviewPage() {
   const router = useRouter();
   const { data: userData, isLoading: isLoadingUser, isError: isUserError, error: userError, refetch: refetchUser } = useGetCurrentUserQuery(undefined);
   const { data: userQuestions, isLoading: isLoadingQuestions, refetch: refetchUserQuestions } = useGetUserQuestionsQuery(undefined);
-  const { data: allUsers, isLoading: isLoadingAllUsers, refetch: refetchAllUsers } = useGetUsersQuery(undefined);
+  const { data: allUsersData, isLoading: isLoadingAllUsers, refetch: refetchAllUsers } = useGetUsersQuery(undefined);
 
   const refetchAll = () => {
     refetchUser();
@@ -32,40 +31,48 @@ export default function ProfileOverviewPage() {
 
   const isLoading = isLoadingUser || isLoadingQuestions || isLoadingAllUsers;
 
-  const contributionData: LineChartData = useMemo(() => {
-    const monthlyContributions = Array(12).fill(0);
+  const contributionData: OverviewData = useMemo(() => {
+    const data: { [key: string]: number } = {};
+    const today = new Date();
+    // Initialize last 365 days
+    for (let i = 364; i >= 0; i--) {
+      const day = subDays(today, i);
+      const formattedDay = format(day, 'yyyy-MM-dd');
+      data[formattedDay] = 0;
+    }
+
     if (userQuestions) {
       userQuestions.forEach((q: any) => {
-        const month = getMonth(new Date(q.createdAt));
-        monthlyContributions[month]++;
+        const date = new Date(q.createdAt);
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        if (data.hasOwnProperty(formattedDate)) {
+          data[formattedDate]++;
+        }
       });
     }
-    return [
-      { name: "Jan", questions: monthlyContributions[0] },
-      { name: "Feb", questions: monthlyContributions[1] },
-      { name: "Mar", questions: monthlyContributions[2] },
-      { name: "Apr", questions: monthlyContributions[3] },
-      { name: "May", questions: monthlyContributions[4] },
-      { name: "Jun", questions: monthlyContributions[5] },
-      { name: "Jul", questions: monthlyContributions[6] },
-      { name: "Aug", questions: monthlyContributions[7] },
-      { name: "Sep", questions: monthlyContributions[8] },
-      { name: "Oct", questions: monthlyContributions[9] },
-      { name: "Nov", questions: monthlyContributions[10] },
-      { name: "Dec", questions: monthlyContributions[11] },
-    ];
-  }, [userQuestions]);
 
-  const leaderboardData: OverviewData = useMemo(() => {
-    if (!allUsers) return [];
-    return allUsers
-      .map((u: any) => ({
-        name: u.username,
-        total: u.questionsAdded || 0,
-      }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 7); // Show top 7 contributors
-  }, [allUsers]);
+    return Object.keys(data).map(date => ({
+      name: date,
+      total: data[date]
+    }));
+  }, [userQuestions]);
+  
+  const { rank, contributionScore } = useMemo(() => {
+    if (!allUsersData || !userData?.user) {
+      return { rank: 0, contributionScore: 0 };
+    }
+    
+    const userScores = allUsersData.map((u: any) => ({
+      id: u.id,
+      score: (u.questionsAdded || 0) * 10 + (u.activeQuestions || 0) * 5,
+    })).sort((a, b) => b.score - a.score);
+
+    const currentUserRank = userScores.findIndex(u => u.id === userData.user.id) + 1;
+    const currentUserScore = userScores.find(u => u.id === userData.user.id)?.score || 0;
+
+    return { rank: currentUserRank, contributionScore: currentUserScore };
+  }, [allUsersData, userData]);
+
 
   if (isLoading) {
     return <ProfileOverviewSkeleton />;
@@ -111,9 +118,7 @@ export default function ProfileOverviewPage() {
   const activeQuestions = user.activeQuestions || 0;
   const approvalRate = totalQuestions > 0 ? ((activeQuestions / totalQuestions) * 100).toFixed(0) : 0;
   // Static data for now as these are more complex to calculate
-  const rank = 12;
   const streak = 5;
-  const contributionScore = totalQuestions * 10 + activeQuestions * 5;
 
   return (
     <div className="space-y-6">
@@ -171,7 +176,7 @@ export default function ProfileOverviewPage() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">#{rank}</div>
+            <div className="text-2xl font-bold">#{rank > 0 ? rank : 'N/A'}</div>
             <p className="text-xs text-muted-foreground">Among all contributors</p>
           </CardContent>
         </Card>
@@ -182,7 +187,7 @@ export default function ProfileOverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{streak} days</div>
-            <p className="text-xs text-muted-foreground">Consecutive contribution</p>
+            <p className="text-xs text-muted-foreground">Consecutive contribution (dummy)</p>
           </CardContent>
         </Card>
         <Card>
@@ -197,30 +202,17 @@ export default function ProfileOverviewPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Contribution</CardTitle>
-              <CardDescription>
-                Questions added by you over time.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <LineChartComponent data={contributionData} />
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>Contribution Leaderboard</CardTitle>
-              <CardDescription>
-                Your score compared to others.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <OverviewChart data={leaderboardData} />
-            </CardContent>
-          </Card>
-        </div>
+       <Card>
+        <CardHeader>
+          <CardTitle>Your Contribution Activity</CardTitle>
+          <CardDescription>
+            Your question submissions over the last year.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pl-2">
+          <OverviewChart data={contributionData} />
+        </CardContent>
+      </Card>
        
        <Card>
         <CardHeader>

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Menu, RotateCw, ArrowRight, Search, User, Database } from 'lucide-react';
+import { Terminal, Menu, Eye, ArrowRight, Search, User, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -273,7 +273,7 @@ export default function Home() {
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
             disabled={cards.length === 0}
           >
-              <RotateCw className="h-6 w-6" />
+              <Eye className="h-6 w-6" />
               <span className="sr-only">{isFlipped ? 'Hide' : 'Reveal'}</span>
           </Button>
           <Button 
