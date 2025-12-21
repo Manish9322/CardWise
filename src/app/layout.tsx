@@ -1,3 +1,4 @@
+
 'use client';
 
 import './globals.css';
@@ -7,10 +8,33 @@ import { Toaster } from '@/components/ui/toaster';
 import { useAppSelector } from '@/lib/store/hooks';
 import MaintenancePage from '@/components/common/MaintenancePage';
 import { usePathname } from 'next/navigation';
+import { useGetSettingsQuery } from '@/utils/services/api';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setMaintenanceMode } from '@/lib/store/features/app/appSlice';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const isMaintenanceMode = useAppSelector((state) => state.app.isMaintenanceMode);
   const pathname = usePathname();
+  const dispatch = useDispatch();
+
+  const { data: settingsData, isLoading, isSuccess } = useGetSettingsQuery(undefined, {
+    skip: pathname.startsWith('/admin'), // Don't fetch on admin routes
+  });
+
+  useEffect(() => {
+    if (isSuccess && settingsData) {
+      dispatch(setMaintenanceMode(settingsData.isMaintenanceMode));
+    }
+  }, [settingsData, isSuccess, dispatch]);
+
+  if (isLoading && !pathname.startsWith('/admin')) {
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          Loading...
+        </div>
+      );
+  }
 
   // Maintenance mode should not affect the admin panel
   if (isMaintenanceMode && !pathname.startsWith('/admin')) {

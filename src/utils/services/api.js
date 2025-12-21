@@ -51,7 +51,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["DB", "Questions", "Users", "CurrentUser"],
+  tagTypes: ["DB", "Questions", "Users", "CurrentUser", "Settings"],
   endpoints: (builder) => ({
     // DB connection test endpoint
     testDBConnection: builder.query({
@@ -146,6 +146,19 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users", "Questions"],
     }),
+    // Settings endpoints
+    getSettings: builder.query({
+        query: () => '/settings',
+        providesTags: ['Settings'],
+    }),
+    updateSettings: builder.mutation({
+        query: (settings) => ({
+            url: '/settings',
+            method: 'PUT',
+            body: settings,
+        }),
+        invalidatesTags: ['Settings'],
+    }),
   }),
 });
 
@@ -164,4 +177,6 @@ export const {
   useUpdateUserMutation,
   useUpdateUserPasswordMutation,
   useDeleteUserMutation,
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
 } = api;

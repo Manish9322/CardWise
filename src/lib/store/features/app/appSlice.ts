@@ -1,4 +1,6 @@
+
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { api } from '@/utils/services/api';
 
 type AppState = {
   isMaintenanceMode: boolean;
@@ -15,6 +17,14 @@ const appSlice = createSlice({
     setMaintenanceMode: (state, action: PayloadAction<boolean>) => {
       state.isMaintenanceMode = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      api.endpoints.getSettings.matchFulfilled,
+      (state, { payload }) => {
+        state.isMaintenanceMode = payload.isMaintenanceMode;
+      }
+    )
   },
 });
 

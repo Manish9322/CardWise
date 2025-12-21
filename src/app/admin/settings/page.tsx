@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -20,8 +21,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setMaintenanceMode } from '@/lib/store/features/app/appSlice';
+import { useGetSettingsQuery, useUpdateSettingsMutation } from '@/utils/services/api';
+import { ManageUsersSkeleton } from '@/components/admin/skeletons/ManageUsersSkeleton';
 
 
 function AccountSettingsTab() {
@@ -49,17 +50,29 @@ function AccountSettingsTab() {
 }
 
 function GeneralSettingsTab() {
-    const dispatch = useAppDispatch();
-    const isMaintenanceMode = useAppSelector((state) => state.app.isMaintenanceMode);
+    const { data: settings, isLoading: isLoadingSettings } = useGetSettingsQuery(undefined);
+    const [updateSettings, { isLoading: isUpdatingSettings }] = useUpdateSettingsMutation();
     const { toast } = useToast();
 
-    const handleMaintenanceToggle = (checked: boolean) => {
-        dispatch(setMaintenanceMode(checked));
-        toast({
-            title: 'Settings Updated',
-            description: `Maintenance mode has been ${checked ? 'enabled' : 'disabled'}.`,
-        });
+    const handleSettingChange = async (key: 'isMaintenanceMode' | 'allowUserRegistrations', value: boolean) => {
+        try {
+            await updateSettings({ [key]: value }).unwrap();
+            toast({
+                title: 'Settings Updated',
+                description: `Setting '${key}' has been updated.`,
+            });
+        } catch (err) {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Failed to update settings.',
+            });
+        }
     };
+    
+    if (isLoadingSettings) {
+        return <ManageUsersSkeleton />;
+    }
 
     return (
         <Card>
@@ -76,8 +89,9 @@ function GeneralSettingsTab() {
                         <p className="text-sm text-muted-foreground">Put the site in maintenance mode.</p>
                     </div>
                     <Switch
-                        checked={isMaintenanceMode}
-                        onCheckedChange={handleMaintenanceToggle}
+                        checked={settings?.isMaintenanceMode}
+                        onCheckedChange={(checked) => handleSettingChange('isMaintenanceMode', checked)}
+                        disabled={isUpdatingSettings}
                     />
                 </div>
                  <div className="flex items-center justify-between rounded-lg border p-4">
@@ -85,7 +99,11 @@ function GeneralSettingsTab() {
                         <h4 className="font-medium">User Registrations</h4>
                         <p className="text-sm text-muted-foreground">Allow new users to register.</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                        checked={settings?.allowUserRegistrations}
+                        onCheckedChange={(checked) => handleSettingChange('allowUserRegistrations', checked)}
+                        disabled={isUpdatingSettings}
+                    />
                 </div>
             </CardContent>
              <CardFooter>

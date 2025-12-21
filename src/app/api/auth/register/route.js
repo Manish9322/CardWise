@@ -1,11 +1,21 @@
+
 import { NextResponse } from "next/server";
 import connectDB from "@/utils/db";
 import User from "../../../../../models/user.model.js";
+import Settings from "../../../../../models/settings.model.js";
 import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
     await connectDB();
+
+    const appSettings = await Settings.findOne();
+    if (!appSettings?.allowUserRegistrations) {
+      return NextResponse.json(
+        { success: false, error: "User registration is currently disabled by the administrator." },
+        { status: 403 }
+      );
+    }
     
     const body = await request.json();
     const { username, email, phone, password } = body;
