@@ -1,3 +1,4 @@
+
 export type Card = {
   id: string;
   question: string;
@@ -16,6 +17,7 @@ export type User = {
   email: string;
   phone: string;
   questionsAdded: number;
+  activeQuestions?: number;
   status: 'active' | 'inactive';
   createdAt: string;
 };

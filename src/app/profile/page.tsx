@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -62,7 +63,12 @@ export default function ProfileOverviewPage() {
 
   const user = data.user;
   const totalQuestions = user.questionsAdded || 0;
-  const activeQuestions = Math.floor(totalQuestions * 0.75);
+  const activeQuestions = user.activeQuestions || 0;
+  const approvalRate = totalQuestions > 0 ? ((activeQuestions / totalQuestions) * 100).toFixed(0) : 0;
+  // Static data for now as these are more complex to calculate
+  const rank = 12;
+  const streak = 5;
+  const contributionScore = totalQuestions * 10 + activeQuestions * 5;
 
   return (
     <div className="space-y-6">
@@ -110,7 +116,7 @@ export default function ProfileOverviewPage() {
             <Check className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">75%</div>
+            <div className="text-2xl font-bold">{approvalRate}%</div>
             <p className="text-xs text-muted-foreground">Based on submitted questions</p>
           </CardContent>
         </Card>
@@ -120,7 +126,7 @@ export default function ProfileOverviewPage() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">#12</div>
+            <div className="text-2xl font-bold">#{rank}</div>
             <p className="text-xs text-muted-foreground">Among all contributors</p>
           </CardContent>
         </Card>
@@ -130,7 +136,7 @@ export default function ProfileOverviewPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5 days</div>
+            <div className="text-2xl font-bold">{streak} days</div>
             <p className="text-xs text-muted-foreground">Consecutive contribution</p>
           </CardContent>
         </Card>
@@ -140,7 +146,7 @@ export default function ProfileOverviewPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250</div>
+            <div className="text-2xl font-bold">{contributionScore}</div>
             <p className="text-xs text-muted-foreground">Your overall impact</p>
           </CardContent>
         </Card>
