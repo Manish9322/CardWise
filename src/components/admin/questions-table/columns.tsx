@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -160,7 +161,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: Get
       },
       cell: ({ row }) => {
         const username = row.getValue('username') as string;
-        return <div className="truncate max-w-[100px] md:max-w-[120px]">{username || 'Unknown'}</div>;
+        return <div className="truncate max-w-[100px] md:max-w-[120px]">{username || 'Admin'}</div>;
       },
        enableHiding: true,
     },

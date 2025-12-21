@@ -97,7 +97,7 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
   };
 
 
-  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView, handleDelete }), []);
+  const columns = React.useMemo(() => getColumns({ handleOpenForm, handleOpenView, handleDelete }), [handleOpenForm, handleOpenView, handleDelete]);
 
   const table = useReactTable({
     data,
@@ -181,17 +181,17 @@ export function QuestionsTable({ data, initialFilters = [], filterUsername }: Qu
       <QuestionsTablePagination table={table} />
       <QuestionFormModal
         isOpen={activeModal === 'form'}
-        onOpenChange={handleCloseModals}
+        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
         question={selectedQuestion}
       />
       <BulkQuestionFormModal 
         isOpen={activeModal === 'bulk'}
-        onOpenChange={handleCloseModals}
+        onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
       />
       {selectedQuestion && (
          <ViewQuestionModal
             isOpen={activeModal === 'view'}
-            onOpenChange={handleCloseModals}
+            onOpenChange={(isOpen) => !isOpen && handleCloseModals()}
             question={selectedQuestion}
         />
       )}
