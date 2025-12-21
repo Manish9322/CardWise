@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import GuessCard from '@/components/game/GuessCard';
 import GuessCardSkeleton from '@/components/game/GuessCardSkeleton';
 import QuestionsSidebarSkeleton from '@/components/game/QuestionsSidebarSkeleton';
+import IntroAnimation from '@/components/game/IntroAnimation';
 import ReactConfetti from 'react-confetti';
 import {
   Sheet,
@@ -23,6 +24,7 @@ import { Terminal, Menu, RotateCw, ArrowRight, Search, User, Database } from 'lu
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { AnimatePresence } from 'framer-motion';
 
 // Custom hook for debouncing
 function useDebounce<T>(value: T, delay: number): T {
@@ -128,14 +130,20 @@ function ConfettiWrapper({ onComplete }: { onComplete: () => void }) {
 }
 
 export default function Home() {
-  // Use RTK Query to fetch questions
   const { data: allQuestions, isLoading, error: queryError } = useGetQuestionsQuery(undefined);
-  
-  // Filter and shuffle active cards
+  const [showIntro, setShowIntro] = useState(true);
+
+  // Once loading is complete, hide the intro after its animation finishes
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => setShowIntro(false), 2500); // Duration of intro animation + delay
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
   const cards = useMemo(() => {
     if (!allQuestions) return [];
     const activeCards = allQuestions.filter((card: any) => card.status === 'active');
-    // Shuffle the cards
     return activeCards.sort(() => Math.random() - 0.5);
   }, [allQuestions]);
   
@@ -182,14 +190,6 @@ export default function Home() {
   };
 
   const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="flex flex-col items-center justify-center text-center w-full flex-1">
-          <GuessCardSkeleton />
-        </div>
-      );
-    }
-
     if (queryError) {
        return (
         <Alert variant="destructive" className="max-w-md">
@@ -200,7 +200,7 @@ export default function Home() {
        );
     }
 
-    if (cards.length === 0) {
+    if (cards.length === 0 && !isLoading) {
       return (
         <Alert className="max-w-md">
           <Terminal className="h-4 w-4" />
@@ -211,6 +211,14 @@ export default function Home() {
     }
 
     const currentCard = cards[currentIndex];
+    
+    if (!currentCard) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center w-full flex-1">
+          <GuessCardSkeleton />
+        </div>
+      );
+    }
 
     return (
       <div className="flex flex-col items-center justify-center text-center w-full flex-1">
@@ -230,13 +238,20 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
+       <AnimatePresence>
+         {showIntro && <IntroAnimation />}
+       </AnimatePresence>
+       
        {showConfetti && <ConfettiWrapper onComplete={() => setShowConfetti(false)} />}
+       
        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex items-center gap-2">
         <QuestionsSidebar allQuestions={allQuestions || []} isLoading={isLoading} />
        </div>
+       
       <main className="flex flex-1 flex-col items-center justify-center p-4">
         {renderContent()}
       </main>
+      
       <div className="fixed top-4 left-4 z-10 flex flex-col gap-2">
         <Button asChild size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">
           <Link href="/profile">
@@ -246,6 +261,7 @@ export default function Home() {
         </Button>
         <ThemeToggle />
       </div>
+      
       <div className="fixed bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-row gap-2">
           <Button 
             onClick={handleReveal}
