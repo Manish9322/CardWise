@@ -22,10 +22,11 @@ const containerVariants = {
 };
 
 const letterVariants = {
-  hidden: { opacity: 0, y: 50 },
+  hidden: { opacity: 0, y: 50, rotate: -10 },
   visible: {
     opacity: 1,
     y: 0,
+    rotate: 0,
     transition: {
       type: 'spring',
       damping: 12,
