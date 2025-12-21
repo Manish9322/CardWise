@@ -83,7 +83,7 @@ export default function IntroAnimation() {
       exit="exit"
       variants={containerVariants}
     >
-        <div className="relative w-80 h-36 md:w-96 md:h-44 flex flex-col items-center justify-center">
+        <div className="relative w-80 h-44 md:w-1/2 md:h-56 flex flex-col items-center justify-center">
             <svg className="absolute w-full h-full" viewBox="0 0 320 144" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <motion.rect 
                     x="1" 
@@ -101,7 +101,7 @@ export default function IntroAnimation() {
                 variants={textContainerVariants}
             >
                 <motion.h1
-                    className="text-5xl md:text-6xl font-bold text-primary flex overflow-hidden"
+                    className="text-5xl md:text-7xl font-bold text-primary flex overflow-hidden"
                     aria-label={title}
                     variants={textContainerVariants}
                 >
