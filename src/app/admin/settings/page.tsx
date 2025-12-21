@@ -38,7 +38,7 @@ function AccountSettingsTab() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="admin@example.com" />
+                    <Input id="email" type="email" defaultValue="admin@cardwise.com" />
                 </div>
             </CardContent>
             <CardFooter>

@@ -61,6 +61,9 @@ export default function LoginForm() {
     }
   };
 
+  // email : admin@cardwise.com
+  // password : Password@cardwise
+
   return (
     <Card>
       <CardHeader>
@@ -107,7 +110,6 @@ export default function LoginForm() {
                 </FormItem>
               )}
             />
-            <p className="text-xs text-muted-foreground">Hint: Use `admin@cardwise.com` and `Password@cardwise`.</p>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
