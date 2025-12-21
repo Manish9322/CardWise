@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -51,6 +52,9 @@ import { useRouter } from 'next/navigation';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
+import { toggleTheme } from '@/lib/store/features/theme/themeSlice';
+
 
 const accountFormSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -289,6 +293,9 @@ function PasswordSettingsTab() {
 }
 
 function PreferencesSettingsTab() {
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.theme.mode);
+
   return (
     <Card>
       <CardHeader>
@@ -305,17 +312,13 @@ function PreferencesSettingsTab() {
         </div>
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div>
-            <h4 className="font-medium">Marketing Emails</h4>
-            <p className="text-sm text-muted-foreground">Receive emails about new products and features.</p>
-          </div>
-          <Switch />
-        </div>
-        <div className="flex items-center justify-between rounded-lg border p-4">
-          <div>
             <h4 className="font-medium">Dark Mode</h4>
             <p className="text-sm text-muted-foreground">Toggle between light and dark themes.</p>
           </div>
-          <Switch />
+          <Switch
+            checked={theme === 'dark'}
+            onCheckedChange={() => dispatch(toggleTheme())}
+          />
         </div>
       </CardContent>
       <CardFooter>
@@ -328,7 +331,8 @@ function PreferencesSettingsTab() {
 function DangerZoneTab({ userId }: { userId: string }) {
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteUser, { isLoading }] = useDeleteUserMutation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
   const handleDeleteAccount = async () => {
     try {
@@ -370,7 +374,7 @@ function DangerZoneTab({ userId }: { userId: string }) {
                 End your current session on this device.
               </p>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
+            <Button variant="outline" onClick={() => setShowLogoutModal(true)}>
               Log Out
             </Button>
           </div>
@@ -388,6 +392,26 @@ function DangerZoneTab({ userId }: { userId: string }) {
         </CardContent>
       </Card>
 
+      <AlertDialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will be returned to the login page.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogout}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Log Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -401,10 +425,10 @@ function DangerZoneTab({ userId }: { userId: string }) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
-              disabled={isLoading}
+              disabled={isDeleting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isLoading ? 'Deleting...' : 'Yes, delete my account'}
+              {isDeleting ? 'Deleting...' : 'Yes, delete my account'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
