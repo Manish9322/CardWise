@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -19,12 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { OverviewChart } from '@/components/admin/dashboard/OverviewChart';
+import { OverviewChart, type OverviewData } from '@/components/admin/dashboard/OverviewChart';
 import { RecentUsers } from '@/components/admin/dashboard/RecentUsers';
 import { RecentQuestions } from '@/components/admin/dashboard/RecentQuestions';
-import { LineChartComponent } from '@/components/admin/dashboard/LineChartComponent';
+import { LineChartComponent, type LineChartData } from '@/components/admin/dashboard/LineChartComponent';
 import { useGetQuestionsQuery, useGetUsersQuery } from '@/utils/services/api';
 import { ManageQuestionsSkeleton } from '@/components/admin/skeletons/ManageQuestionsSkeleton';
+import { useMemo } from 'react';
+import { getMonth, format, subDays, isAfter } from 'date-fns';
 
 export default function Dashboard() {
   const { data: cardData, isLoading: isLoadingCards, error: cardsError, refetch: refetchCards } = useGetQuestionsQuery(undefined);
@@ -34,8 +37,50 @@ export default function Dashboard() {
     refetchCards();
     refetchUsers();
   }
+  
+  const isLoading = isLoadingCards || isLoadingUsers;
 
-  if (isLoadingCards || isLoadingUsers) {
+  const questionsActivityData: LineChartData = useMemo(() => {
+    const monthlyData = Array(12).fill(0);
+    if (cardData) {
+      cardData.forEach((q: any) => {
+        const month = getMonth(new Date(q.createdAt));
+        monthlyData[month]++;
+      });
+    }
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return monthNames.map((name, index) => ({ name, questions: monthlyData[index] }));
+  }, [cardData]);
+
+  const usersOverviewData: OverviewData = useMemo(() => {
+    const dailyData: { [key: string]: number } = {};
+    const today = new Date();
+    
+    // Initialize last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const day = subDays(today, i);
+      const formattedDay = format(day, 'MMM d');
+      dailyData[formattedDay] = 0;
+    }
+
+    if (userData) {
+      userData.forEach((u: any) => {
+        const joinDate = new Date(u.createdAt);
+        const sevenDaysAgo = subDays(today, 6);
+        if (isAfter(joinDate, sevenDaysAgo)) {
+          const formattedDay = format(joinDate, 'MMM d');
+          if (dailyData.hasOwnProperty(formattedDay)) {
+            dailyData[formattedDay]++;
+          }
+        }
+      });
+    }
+    
+    return Object.keys(dailyData).map(day => ({ name: day, total: dailyData[day] }));
+  }, [userData]);
+
+
+  if (isLoading) {
     return <ManageQuestionsSkeleton />;
   }
 
@@ -149,7 +194,7 @@ export default function Dashboard() {
               <CardDescription>A line chart showing questions added over time.</CardDescription>
             </CardHeader>
             <CardContent>
-              <LineChartComponent />
+              <LineChartComponent data={questionsActivityData} />
             </CardContent>
           </Card>
            <Card>
@@ -166,7 +211,7 @@ export default function Dashboard() {
               </Button>
             </CardHeader>
             <CardContent>
-              <OverviewChart />
+              <OverviewChart data={usersOverviewData} />
             </CardContent>
           </Card>
         </div>
