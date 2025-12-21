@@ -14,6 +14,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
 import { Button } from '@/components/ui/button';
+import { LineChartComponent, type LineChartData } from '@/components/admin/dashboard/LineChartComponent';
+import { OverviewChart, type OverviewData } from '@/components/admin/dashboard/OverviewChart';
+import { getMonth } from 'date-fns';
+
 
 export default function ProfileOverviewPage() {
   const router = useRouter();
@@ -44,6 +48,40 @@ export default function ProfileOverviewPage() {
 
     return { rank: currentUserRank, contributionScore: currentUserScore };
   }, [allUsersData, userData]);
+
+  const questionsActivityData: LineChartData = useMemo(() => {
+    const monthlyData = Array(12).fill(0);
+    if (userQuestions) {
+      userQuestions.forEach((q: any) => {
+        const month = getMonth(new Date(q.createdAt));
+        monthlyData[month]++;
+      });
+    }
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return monthNames.map((name, index) => ({ name, questions: monthlyData[index] }));
+  }, [userQuestions]);
+
+  const questionStatusData: OverviewData = useMemo(() => {
+    if (!userQuestions) return [];
+    
+    const statusCounts = {
+      active: 0,
+      pending: 0,
+      inactive: 0,
+    };
+
+    userQuestions.forEach((q: any) => {
+        if (statusCounts.hasOwnProperty(q.status)) {
+            statusCounts[q.status as keyof typeof statusCounts]++;
+        }
+    });
+    
+    return [
+        { name: "Active", total: statusCounts.active },
+        { name: "Pending", total: statusCounts.pending },
+        { name: "Inactive", total: statusCounts.inactive },
+    ];
+  }, [userQuestions]);
 
 
   if (isLoading) {
@@ -173,6 +211,27 @@ export default function ProfileOverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-4 md:gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Questions Activity</CardTitle>
+              <CardDescription>A line chart showing your question submissions per month.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LineChartComponent data={questionsActivityData} />
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>Your Question Status</CardTitle>
+              <CardDescription>A breakdown of your questions by their current status.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <OverviewChart data={questionStatusData} />
+            </CardContent>
+          </Card>
+        </div>
        
        <Card>
         <CardHeader>
