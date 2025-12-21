@@ -29,8 +29,8 @@ export default function LoginForm() {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'admin@cardwise.com',
-      password: 'Password@cardwise',
+      email: '',
+      password: '',
     },
   });
 
@@ -91,7 +91,7 @@ export default function LoginForm() {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input type={showPassword ? 'text' : 'password'} {...field} />
+                      <Input type={showPassword ? 'text' : 'password'} placeholder="Password" {...field} />
                       <Button
                         type="button"
                         variant="ghost"

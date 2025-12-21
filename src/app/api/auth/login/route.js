@@ -18,6 +18,8 @@ export async function POST(request) {
     }
     
     // Handle hardcoded admin credentials
+    // Email: admin@cardwise.com
+    // Password: Password@cardwise
     if (email === 'admin@cardwise.com' && password === 'Password@cardwise') {
         await createSession('admin_user');
         return NextResponse.json({
