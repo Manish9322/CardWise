@@ -166,7 +166,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button asChild variant="outline" size="lg" className="h-20 flex-col gap-1">
                 <Link href="/admin/manage-users">
                     <UserPlus className="h-6 w-6" />
