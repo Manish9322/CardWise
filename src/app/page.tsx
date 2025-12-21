@@ -190,6 +190,10 @@ export default function Home() {
   };
 
   const renderContent = () => {
+    if (isLoading) {
+       return null; // Don't render anything while loading, intro animation will be shown
+    }
+
     if (queryError) {
        return (
         <Alert variant="destructive" className="max-w-md">
@@ -200,7 +204,7 @@ export default function Home() {
        );
     }
 
-    if (cards.length === 0 && !isLoading) {
+    if (cards.length === 0) {
       return (
         <Alert className="max-w-md">
           <Terminal className="h-4 w-4" />

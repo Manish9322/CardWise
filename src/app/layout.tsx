@@ -28,17 +28,23 @@ function AppContent({ children }: { children: React.ReactNode }) {
     }
   }, [settingsData, isSuccess, dispatch]);
 
-  if (isLoading && !pathname.startsWith('/admin')) {
-      return (
-        <div className="flex min-h-screen items-center justify-center">
-          Loading...
-        </div>
-      );
+  // While settings are loading, we don't want to show the "Loading..." text.
+  // The main page (`page.tsx`) will handle its own loading state with the intro animation.
+  // For other pages, they might have their own loading states.
+  // If maintenance mode is active, we show it immediately, even during the initial settings load.
+  if (settingsData?.isMaintenanceMode && !pathname.startsWith('/admin')) {
+    return <MaintenancePage />;
   }
 
-  // Maintenance mode should not affect the admin panel
-  if (isMaintenanceMode && !pathname.startsWith('/admin')) {
-    return <MaintenancePage />;
+  // If the settings are still loading, and we are on a non-admin, non-main page,
+  // we can show a generic loading state or nothing, but for now we'll let the child render
+  // and handle its own loading state. The main page already does this gracefully.
+  if (isLoading && !pathname.startsWith('/admin') && pathname !== '/') {
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          {/* This can be a more sophisticated skeleton loader if needed */}
+        </div>
+      );
   }
 
   return <>{children}</>;
