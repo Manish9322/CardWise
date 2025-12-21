@@ -123,7 +123,7 @@ export default function Dashboard() {
                 Refresh
             </Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
@@ -187,7 +187,7 @@ export default function Dashboard() {
             </Button>
         </div>
 
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 md:gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Questions Activity</CardTitle>
@@ -216,7 +216,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 md:gap-4 lg:grid-cols-2">
             <RecentQuestions questions={cardList} />
             <RecentUsers users={userList} />
         </div>
