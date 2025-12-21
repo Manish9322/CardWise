@@ -13,9 +13,7 @@ import { useGetCurrentUserQuery, useGetUserQuestionsQuery, useGetUsersQuery } fr
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
-import { OverviewChart, type OverviewData } from '@/components/admin/dashboard/OverviewChart';
 import { Button } from '@/components/ui/button';
-import { format, getMonth, isAfter, subDays } from 'date-fns';
 
 export default function ProfileOverviewPage() {
   const router = useRouter();
@@ -30,32 +28,6 @@ export default function ProfileOverviewPage() {
   };
 
   const isLoading = isLoadingUser || isLoadingQuestions || isLoadingAllUsers;
-
-  const contributionData: OverviewData = useMemo(() => {
-    const data: { [key: string]: number } = {};
-    const today = new Date();
-    // Initialize last 365 days
-    for (let i = 364; i >= 0; i--) {
-      const day = subDays(today, i);
-      const formattedDay = format(day, 'yyyy-MM-dd');
-      data[formattedDay] = 0;
-    }
-
-    if (userQuestions) {
-      userQuestions.forEach((q: any) => {
-        const date = new Date(q.createdAt);
-        const formattedDate = format(date, 'yyyy-MM-dd');
-        if (data.hasOwnProperty(formattedDate)) {
-          data[formattedDate]++;
-        }
-      });
-    }
-
-    return Object.keys(data).map(date => ({
-      name: date,
-      total: data[date]
-    }));
-  }, [userQuestions]);
   
   const { rank, contributionScore } = useMemo(() => {
     if (!allUsersData || !userData?.user) {
@@ -201,18 +173,6 @@ export default function ProfileOverviewPage() {
           </CardContent>
         </Card>
       </div>
-
-       <Card>
-        <CardHeader>
-          <CardTitle>Your Contribution Activity</CardTitle>
-          <CardDescription>
-            Your question submissions over the last year.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <OverviewChart data={contributionData} />
-        </CardContent>
-      </Card>
        
        <Card>
         <CardHeader>
