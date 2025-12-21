@@ -18,6 +18,7 @@ import { Switch } from '@/components/ui/switch';
 import type { Card } from '@/lib/definitions';
 import { useUpdateQuestionMutation } from '@/utils/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 type GetColumnsProps = {
   handleOpenForm: (question: Card) => void;
@@ -30,8 +31,12 @@ export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: Get
   const StatusToggle = ({ row }: { row: any }) => {
     const { toast } = useToast();
     const [updateQuestion] = useUpdateQuestionMutation();
-    const card = row.original;
+    const card = row.original as Card;
     const [isActive, setIsActive] = React.useState(card.status === 'active');
+    
+    if (card.status === 'pending') {
+      return <Badge variant="secondary">Pending</Badge>;
+    }
 
     const handleToggle = async (checked: boolean) => {
       const newStatus = checked ? 'active' : 'inactive';
@@ -58,7 +63,13 @@ export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: Get
       }
     };
     
-    return <Switch checked={isActive} onCheckedChange={handleToggle} aria-label="Toggle card status" />;
+    return (
+        <Switch 
+            checked={isActive} 
+            onCheckedChange={handleToggle} 
+            aria-label="Toggle card status"
+        />
+    );
   }
 
   const ActionsCell = ({ row }: { row: any }) => {
@@ -154,7 +165,7 @@ export const getColumns = ({ handleOpenForm, handleOpenView, handleDelete }: Get
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-              Visibility
+              Status
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           )

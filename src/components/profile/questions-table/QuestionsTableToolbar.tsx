@@ -66,12 +66,12 @@ export function QuestionsTableToolbar<TData>({
                 <div className="space-y-2">
                     <h4 className="font-medium leading-none">Advanced Filters</h4>
                     <p className="text-sm text-muted-foreground">
-                    Filter questions by visibility.
+                    Filter questions by status.
                     </p>
                 </div>
                 <div className="grid gap-2">
                     <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="status">Visibility</Label>
+                        <Label htmlFor="status">Status</Label>
                         <Select
                             value={table.getColumn('status')?.getFilterValue() as string ?? 'all'}
                             onValueChange={value => {
@@ -87,8 +87,9 @@ export function QuestionsTableToolbar<TData>({
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="active">Visible</SelectItem>
-                                <SelectItem value="inactive">Hidden</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
