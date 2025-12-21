@@ -29,8 +29,8 @@ export async function POST(request) {
 
     await connectDB();
     
-    // Find user by email
-    const user = await User.findOne({ email: email.toLowerCase() });
+    // Find user by email and explicitly include the password
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     
     if (!user) {
       return NextResponse.json(
