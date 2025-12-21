@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -245,7 +246,7 @@ export default function Home() {
         </Button>
         <ThemeToggle />
       </div>
-      <div className="fixed bottom-4 left-4 z-10 flex flex-col gap-2">
+      <div className="fixed bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-row gap-2">
           <Button 
             onClick={handleReveal}
             size="icon"
