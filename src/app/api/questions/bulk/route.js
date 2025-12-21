@@ -29,8 +29,10 @@ export async function POST(request) {
 
     await connectDB();
     
+    const isUserAdmin = session.userId === 'admin_user';
+
     // If the user is a regular user, check their status.
-    if (session.userId !== 'admin_user') {
+    if (!isUserAdmin) {
       const user = await User.findById(session.userId).select("status").lean();
 
       if (!user) {
@@ -53,10 +55,11 @@ export async function POST(request) {
     }
 
 
-    // Add userId to each question, handle admin case
-    const userIdForDb = session.userId === 'admin_user' ? null : session.userId;
+    // Add userId and set status for each question
+    const userIdForDb = isUserAdmin ? null : session.userId;
     const questionsWithUser = questions.map(q => ({
       ...q,
+      status: isUserAdmin ? (q.status || 'inactive') : 'pending',
       userId: userIdForDb,
     }));
 

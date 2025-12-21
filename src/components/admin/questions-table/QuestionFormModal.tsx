@@ -38,7 +38,7 @@ interface QuestionFormModalProps {
 const formSchema = z.object({
   question: z.string().min(1, 'Question is required'),
   answer: z.string().min(1, 'Answer is required'),
-  status: z.enum(['active', 'inactive']),
+  status: z.enum(['active', 'inactive', 'pending']),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -54,7 +54,7 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
     defaultValues: {
       question: '',
       answer: '',
-      status: 'inactive',
+      status: 'pending',
     },
   });
   
@@ -69,7 +69,7 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
         form.reset({
             question: '',
             answer: '',
-            status: 'inactive'
+            status: 'pending'
         });
     }
   }, [question, form, isOpen]);
@@ -91,7 +91,7 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
               answer: data.answer,
               status: data.status,
             }).unwrap();
-            toast({ title: "Success", description: "Question created successfully." });
+            toast({ title: "Success", description: "Question submitted for approval." });
         }
         onOpenChange(false);
     } catch (error) {
@@ -145,7 +145,7 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
               name="status"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Visibility</FormLabel>
+                  <FormLabel>Status</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -156,13 +156,19 @@ export function QuestionFormModal({ isOpen, onOpenChange, question }: QuestionFo
                         <FormControl>
                           <RadioGroupItem value="active" />
                         </FormControl>
-                        <FormLabel className="font-normal">Visible</FormLabel>
+                        <FormLabel className="font-normal">Active</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="inactive" />
                         </FormControl>
-                        <FormLabel className="font-normal">Hidden</FormLabel>
+                        <FormLabel className="font-normal">Inactive</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="pending" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Pending</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>

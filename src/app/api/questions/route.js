@@ -50,7 +50,8 @@ export async function POST(request) {
     }
     
     const body = await request.json();
-    const { question, answer, status = "inactive" } = body;
+    const { question, answer } = body;
+    let { status } = body;
 
     if (!question || !answer) {
       return NextResponse.json(
@@ -61,31 +62,38 @@ export async function POST(request) {
 
     await connectDB();
 
-    // If it's a regular user, check their status
-    if (session.userId !== 'admin_user') {
+    const isUserAdmin = session.userId === 'admin_user';
+
+    // If it's a regular user, check their status and force 'pending'
+    if (!isUserAdmin) {
         const user = await User.findById(session.userId).select("status").lean();
 
         if (!user) {
-        return NextResponse.json(
-            { success: false, error: "User not found" },
-            { status: 404 }
-        );
+          return NextResponse.json(
+              { success: false, error: "User not found" },
+              { status: 404 }
+          );
         }
 
         if (user.status !== "active") {
-        return NextResponse.json(
-            {
-            success: false,
-            error:
-                "Your account has been restricted. You cannot add new questions at this time.",
-            },
-            { status: 403 }
-        );
+          return NextResponse.json(
+              {
+              success: false,
+              error:
+                  "Your account has been restricted. You cannot add new questions at this time.",
+              },
+              { status: 403 }
+          );
         }
+        // Force status to 'pending' for non-admin users
+        status = 'pending';
+    } else {
+        // Admin can set status, default to 'inactive' if not provided
+        status = status || 'inactive';
     }
 
 
-    const userIdForDb = session.userId === 'admin_user' ? null : session.userId;
+    const userIdForDb = isUserAdmin ? null : session.userId;
 
     // Create the question
     const newQuestion = await Question.create({

@@ -15,13 +15,13 @@ const questionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "inactive"],
-      default: "inactive",
+      enum: ["active", "inactive", "pending"],
+      default: "pending",
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false, // Changed from true to false
+      required: false,
     },
   },
   {

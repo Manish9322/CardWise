@@ -9,6 +9,7 @@ import {
   PanelLeft,
   BookCopy,
   Settings,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -78,6 +79,11 @@ function AdminSidebar() {
                         <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip="Dashboard">
                             <Link href="/admin"><Home /><span>Dashboard</span></Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/admin/approvals')} tooltip="Approvals">
+                            <Link href="/admin/approvals"><CheckCircle2 /><span>Approvals</span></Link>
                         </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
