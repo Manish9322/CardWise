@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Phone number is required"],
     },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
     status: {
       type: String,
       enum: ["active", "inactive"],

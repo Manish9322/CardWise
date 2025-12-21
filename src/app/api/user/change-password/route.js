@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import connectDB from "@/utils/db";
 import User from "../../../../../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
@@ -43,23 +44,24 @@ export async function POST(request) {
         );
     }
     
-    // TODO: Implement real password verification.
-    // This is a placeholder since passwords are not currently hashed.
-    // In a real app, you would compare `bcrypt.compare(currentPassword, user.password)`.
-    if (currentPassword === "wrongpassword") {
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
         return NextResponse.json(
             { success: false, error: "Incorrect current password." },
             { status: 403 }
         );
     }
 
-    // TODO: Hash the new password before saving
-    // user.password = await bcrypt.hash(newPassword, 10);
-    // await user.save();
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
     
     return NextResponse.json({
       success: true,
-      message: "Password updated successfully (simulated).",
+      message: "Password updated successfully.",
     });
   } catch (error) {
     console.error("Change password error:", error);

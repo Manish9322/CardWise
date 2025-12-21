@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/utils/db";
 import User from "../../../../../models/user.model.js";
 import { createSession } from "@/lib/session";
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
@@ -37,6 +38,15 @@ export async function POST(request) {
         { status: 401 }
       );
     }
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        return NextResponse.json(
+            { success: false, error: "Invalid credentials" },
+            { status: 401 }
+        );
+    }
     
     // Check if user is active
     if (user.status !== "active") {
@@ -45,10 +55,6 @@ export async function POST(request) {
         { status: 403 }
       );
     }
-    
-    // In a real app, you'd verify the hashed password here
-    // For now, we're just checking if the user exists
-    // TODO: Implement proper password hashing and verification
     
     // Create session
     await createSession(user._id.toString());
