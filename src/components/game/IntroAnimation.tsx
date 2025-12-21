@@ -83,13 +83,13 @@ export default function IntroAnimation() {
       exit="exit"
       variants={containerVariants}
     >
-        <div className="relative w-72 h-32 md:w-96 md:h-40 flex flex-col items-center justify-center">
-            <svg className="absolute w-full h-full" viewBox="0 0 288 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className="relative w-80 h-36 md:w-96 md:h-44 flex flex-col items-center justify-center">
+            <svg className="absolute w-full h-full" viewBox="0 0 320 144" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <motion.rect 
                     x="1" 
                     y="1" 
-                    width="286" 
-                    height="126" 
+                    width="318" 
+                    height="142" 
                     rx="12" 
                     stroke="hsl(var(--primary))" 
                     strokeWidth="2"
