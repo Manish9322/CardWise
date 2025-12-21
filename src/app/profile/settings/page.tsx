@@ -47,6 +47,7 @@ import {
   useGetCurrentUserQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  useUpdateUserPasswordMutation,
 } from '@/utils/services/api';
 import { useRouter } from 'next/navigation';
 import { ProfileOverviewSkeleton } from '@/components/profile/ProfileOverviewSkeleton';
@@ -169,7 +170,7 @@ type PasswordFormData = z.infer<typeof passwordFormSchema>;
 
 function PasswordSettingsTab() {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [updateUserPassword, { isLoading }] = useUpdateUserPasswordMutation();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -184,17 +185,23 @@ function PasswordSettingsTab() {
   });
 
   const onSubmit: SubmitHandler<PasswordFormData> = async (data) => {
-    setIsLoading(true);
-    // This is a placeholder for password change logic.
-    // In a real app, you would have an API endpoint for this.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Password change data:', data);
-    toast({
-      title: 'Password Updated',
-      description: 'Your password has been changed (simulated).',
-    });
-    form.reset();
-    setIsLoading(false);
+    try {
+      await updateUserPassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      }).unwrap();
+      toast({
+        title: 'Password Updated',
+        description: 'Your password has been changed successfully.',
+      });
+      form.reset();
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: err.data?.error || 'Failed to update password.',
+      });
+    }
   };
 
   return (

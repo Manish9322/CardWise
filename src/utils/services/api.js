@@ -132,6 +132,13 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users", "CurrentUser"],
     }),
+    updateUserPassword: builder.mutation({
+      query: (data) => ({
+        url: '/user/change-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}`,
@@ -155,5 +162,6 @@ export const {
   useGetUsersQuery,
   useAddUserMutation,
   useUpdateUserMutation,
+  useUpdateUserPasswordMutation,
   useDeleteUserMutation,
 } = api;
