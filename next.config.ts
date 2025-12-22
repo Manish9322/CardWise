@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
     // This is to prevent the default Next.js favicon from being used.
     // It finds the rule that handles `favicon.ico` and excludes it.
     if (!isServer) {
-      const faviconRule = config.module.rules.find(rule => 
+      const faviconRule = config.module.rules.find((rule:any) => 
         rule && typeof rule === 'object' && rule.test instanceof RegExp && rule.test.test('favicon.ico')
       );
       if (faviconRule && typeof faviconRule === 'object') {
